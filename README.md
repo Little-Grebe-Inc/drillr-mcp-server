@@ -106,7 +106,7 @@ drillr exposes a single MCP endpoint with 8 tools — an all-in-one toolkit for 
 | `sec_report_search` | Paragraph-level semantic search over 10-K / 10-Q / 20-F / 6-K / S-1 / DEF 14A filings                            |
 | `sec_report_list`   | List filings by ticker, form type, and date range                                                                |
 | `company_search`    | Resolve tickers, segments, peers, market-cap and listing filters                                                 |
-| `signal_list`       | Live cross-asset signal feed across ~6,900 tickers                                                               |
+| `signal_list`       | Live cross-asset signal feed                                                                                     |
 | `list_tables`       | Discover available SQL tables                                                                                    |
 | `get_table_schema`  | Inspect columns and types for any SQL table                                                                      |
 | `fiscal_utility`    | Fiscal-period helpers (FY/FQ resolution across companies with non-calendar years)                                |
@@ -115,15 +115,15 @@ Full tool reference: [`docs/tools.md`](./docs/tools.md).
 
 ## What's Covered
 
-- **Global equities**: US + Japan, plus ADRs of Chinese / Korean / European companies. Hong Kong / A-shares / Korea native listings coming soon.
+- **Global equities**: US + Japan. Hong Kong / A-shares / Korea native listings coming soon.
 - **Ontology-based Company Search**: Search over the universe of equities with business model descriptions, supply chain positions, growth vector or thematic fit. 
 - **Fundamentals**: financials back to the 1980s, 90+ structured tables (income statement, balance sheet, cash flow, ratios, growth, valuation)
 - **SEC filings**: 10-K / 10-Q / 20-F / 6-K / S-1 / DEF 14A with paragraph-level semantic search
 - **Earnings**: call transcripts with AI-structured summaries (guidance, risks, segments, Q&A), full estimate-vs-actuals history
-- **Markets**: equities, ETFs, indices (incl. Nikkei 225 / TOPIX), forex, crypto, commodities
-- **Analyst coverage**: 565K rating events from 519 firms
-- **News + signals**: continuously-updating feed across ~6,900 tickers, cross-asset (equities, macro, geopolitics, commodities, crypto)
-- **AI value chain alt-data**: 24 categories spanning energy, chips, compute pricing, LLM token economics, model benchmarks, AI company financials, app usage, web traffic, patents, papers, government contracts, trade flows, etc.
+- **Markets**: equities, ETFs, indices, forex, crypto, commodities
+- **Analyst coverage**: rating events and consensus from major sell-side firms
+- **News + signals**: continuously-updating cross-asset feed (equities, macro, geopolitics, commodities, crypto)
+- **AI value chain alt-data**: energy & power, data centers, semiconductors, compute pricing, AI models / companies / benchmarks, LLM token pricing, macro & trade, prediction markets, critical minerals
 
 Full data dictionary: [`docs/tools.md`](./docs/tools.md).
 
