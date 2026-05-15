@@ -92,7 +92,7 @@ What happens under the hood:
 1. Your host routes the question to the `drillr` MCP server
 2. The agent picks the right tools — typically `sec_report_search` (10-Q content) and `run_sql` (financial_statements for margins)
 3. You get back a markdown answer with sources cited, typically in 8-15 seconds
-4. Every 2xx response is a uniform `{ "data": ..., "_credits": { "charged", "method", "balance_after" } }` envelope — see [Pricing](./docs/pricing.md) and [REST API › Response Envelope](./docs/rest-api.md#response-envelope)
+4. Check your remaining credit balance at [drillr.ai/developer/keys](https://drillr.ai/developer/keys); REST clients additionally get an inline `{ "data": ..., "_credits": ... }` envelope on every 2xx (see [Pricing](./docs/pricing.md) and [REST API › Response Envelope](./docs/rest-api.md#response-envelope)) — MCP responses follow standard JSON-RPC and do not carry per-call credit info inline
 
 ## One Toolkit, 8 Tools
 

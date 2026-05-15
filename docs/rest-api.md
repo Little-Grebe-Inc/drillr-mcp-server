@@ -52,7 +52,7 @@ X-API-Key: drl_xxxxxxxx_xxx...
 
 ## Response Envelope
 
-Every `2xx` response wraps the payload in a uniform envelope so clients can use a single parser across all endpoints:
+Every `2xx` response from `/api/v1/*` REST endpoints wraps the payload in a uniform envelope so clients can use a single parser across all endpoints:
 
 ```json
 {
@@ -64,6 +64,8 @@ Every `2xx` response wraps the payload in a uniform envelope so clients can use 
   }
 }
 ```
+
+> **REST only.** MCP responses (over `/mcp/data`) follow standard JSON-RPC and do **not** carry a `_credits` field — to track usage and balance from an MCP-only client, query [drillr.ai/developer/keys](https://drillr.ai/developer/keys) or use any REST endpoint to peek at `_credits.balance_after`.
 
 ### `_credits` field
 
