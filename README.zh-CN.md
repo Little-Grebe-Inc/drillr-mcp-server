@@ -23,7 +23,7 @@
 ## 快速接入
 
 1. 在 [drillr.ai](https://drillr.ai) 注册
-2. 在 [drillr.ai/developer/keys](https://drillr.ai/developer/keys) 创建 `external` scope 的 API key
+2. 在 [drillr.ai/developer/keys](https://drillr.ai/developer/keys) 创建 `external` scope 的 API key(格式 `drl_xxxxxxxx_xxx...`,45 字符)—— 下面 config 里要粘贴它
 3. 加到你 host 的 mcp.json——一个 endpoint 就拿到下面所有工具。
 
 ### 方式 A：手动 mcp.json（任何 MCP host —— 推荐）
@@ -36,11 +36,13 @@
     "drillr": {
       "type": "http",
       "url": "https://gateway.drillr.ai/mcp/data",
-      "headers": { "Authorization": "Bearer ${DRILLR_API_KEY}" }
+      "headers": { "Authorization": "Bearer <YOUR_DRILLR_API_KEY>" }
     }
   }
 }
 ```
+
+> ⚠️ **把 `<YOUR_DRILLR_API_KEY>` 替换成**(连同尖括号一起)你在步骤 2 拿到的 `drl_*` key。熟悉环境变量的用户也可以保留 `${DRILLR_API_KEY}` 写法,前提是先在启动 host 的 shell 里 `export DRILLR_API_KEY=drl_...`(Claude Code / Cursor / VS Code 都支持自动展开)。
 
 Cursor 用户：把上面这段加到 `~/.cursor/mcp.json`。VS Code（GitHub Copilot Chat）用户：在 Command Palette 跑 `MCP: Add Server` 粘贴即可。或用一键安装：
 
@@ -50,7 +52,7 @@ Cursor 用户：把上面这段加到 `~/.cursor/mcp.json`。VS Code（GitHub Co
 
 #### 扣子（字节跳动） / 千帆（百度智能云） / 火山方舟（字节跳动）
 
-按各平台 MCP server 添加规范填入：transport `http`、URL `https://gateway.drillr.ai/mcp/data`、Authorization header 带 `Bearer ${DRILLR_API_KEY}`。
+按各平台 MCP server 添加规范填入:transport `http`、URL `https://gateway.drillr.ai/mcp/data`、Authorization header 写 `Bearer <YOUR_DRILLR_API_KEY>`(把尖括号占位换成你真实的 `drl_*` key)。
 
 #### Hermes Agent
 
@@ -58,7 +60,7 @@ Cursor 用户：把上面这段加到 `~/.cursor/mcp.json`。VS Code（GitHub Co
 mcp_servers:
   drillr:
     url: 'https://gateway.drillr.ai/mcp/data'
-    headers: { Authorization: 'Bearer ${DRILLR_API_KEY}' }
+    headers: { Authorization: 'Bearer <YOUR_DRILLR_API_KEY>' }
 ```
 
 #### 其他 host

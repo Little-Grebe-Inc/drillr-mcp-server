@@ -23,7 +23,7 @@ One API key. Five tools for every research workflow: thesis search engine, stand
 ## Quick Start
 
 1. Sign up at [drillr.ai](https://drillr.ai)
-2. Get an `external`-scope API key at [drillr.ai/developer/keys](https://drillr.ai/developer/keys)
+2. Get an `external`-scope API key (format `drl_xxxxxxxx_xxx...`, 45 chars) at [drillr.ai/developer/keys](https://drillr.ai/developer/keys) — you'll paste this into the config below
 3. Drop into your host's mcp.json — one endpoint exposes all the tools below.
 
 ### Option A: Manual mcp.json (any MCP host — recommended)
@@ -36,11 +36,13 @@ One API key. Five tools for every research workflow: thesis search engine, stand
     "drillr": {
       "type": "http",
       "url": "https://gateway.drillr.ai/mcp/data",
-      "headers": { "Authorization": "Bearer ${DRILLR_API_KEY}" }
+      "headers": { "Authorization": "Bearer <YOUR_DRILLR_API_KEY>" }
     }
   }
 }
 ```
+
+> ⚠️ **Replace `<YOUR_DRILLR_API_KEY>`** (including the angle brackets) with the `drl_*` key you got in step 2. Power users on Claude Code / Cursor / VS Code can use `${DRILLR_API_KEY}` instead and `export DRILLR_API_KEY=drl_...` in the shell launching the host.
 
 For Cursor, paste the block into `~/.cursor/mcp.json`. For VS Code (GitHub Copilot Chat), run `MCP: Add Server` from the Command Palette and paste the block. Or use one-click install:
 
@@ -54,7 +56,7 @@ After install, replace `${DRILLR_API_KEY}` in the generated config with your rea
 mcp_servers:
   drillr:
     url: 'https://gateway.drillr.ai/mcp/data'
-    headers: { Authorization: 'Bearer ${DRILLR_API_KEY}' }
+    headers: { Authorization: 'Bearer <YOUR_DRILLR_API_KEY>' }
 ```
 
 #### Other hosts

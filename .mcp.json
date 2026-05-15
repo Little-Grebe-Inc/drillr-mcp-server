@@ -1,11 +1,11 @@
 {
-  "_comment": "Reference mcp.json for the drillr MCP server. Drop the `mcpServers.drillr` block into your host's mcp.json. Replace ${DRILLR_API_KEY} with your drl_* key (get one at https://drillr.ai/developer/keys).",
+  "_comment": "Reference mcp.json for the drillr MCP server. Drop the `mcpServers.drillr` block into your host's mcp.json and replace <YOUR_DRILLR_API_KEY> (including angle brackets) with your drl_* key from https://drillr.ai/developer/keys. Power users on env-var-aware hosts (Claude Code / Cursor / VS Code) can keep ${DRILLR_API_KEY} instead and export it in the shell.",
   "mcpServers": {
     "drillr": {
       "type": "http",
       "url": "https://gateway.drillr.ai/mcp/data",
       "headers": {
-        "Authorization": "Bearer ${DRILLR_API_KEY}"
+        "Authorization": "Bearer <YOUR_DRILLR_API_KEY>"
       }
     }
   }
