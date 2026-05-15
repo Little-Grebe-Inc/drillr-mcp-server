@@ -1,0 +1,12 @@
+{
+  "_comment": "Reference mcp.json for the drillr MCP server. Drop the `mcpServers.drillr` block into your host's mcp.json. Replace ${DRILLR_API_KEY} with your drl_* key (get one at https://drillr.ai/developer/keys).",
+  "mcpServers": {
+    "drillr": {
+      "type": "http",
+      "url": "https://gateway.drillr.ai/mcp/data",
+      "headers": {
+        "Authorization": "Bearer ${DRILLR_API_KEY}"
+      }
+    }
+  }
+}

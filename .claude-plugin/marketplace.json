@@ -1,0 +1,15 @@
+{
+  "name": "drillr",
+  "owner": {
+    "name": "Little Grebe Inc."
+  },
+  "plugins": [
+    {
+      "name": "drillr",
+      "source": "./",
+      "description": "Drillr financial MCP for AI agents — standardized financial data, SEC filings semantic search, live signals, and 24 alt-data categories.",
+      "category": "data",
+      "tags": ["finance", "mcp", "sec-filings", "alternative-data"]
+    }
+  ]
+}

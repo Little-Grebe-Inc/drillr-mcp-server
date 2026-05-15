@@ -1,0 +1,28 @@
+{
+  "name": "drillr",
+  "description": "Drillr financial MCP for AI agents — standardized financial data, SEC filings semantic search, live signals, and 24 alt-data categories. One HTTP MCP server (gateway.drillr.ai/mcp/data) exposing 8 tools.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Little Grebe Inc."
+  },
+  "homepage": "https://drillr.ai",
+  "repository": "https://github.com/Little-Grebe-Inc/drillr-mcp-server",
+  "license": "MIT",
+  "keywords": [
+    "mcp",
+    "finance",
+    "sec-filings",
+    "alternative-data",
+    "agentic-research",
+    "llm-native"
+  ],
+  "mcpServers": {
+    "drillr": {
+      "type": "http",
+      "url": "https://gateway.drillr.ai/mcp/data",
+      "headers": {
+        "Authorization": "Bearer ${DRILLR_API_KEY}"
+      }
+    }
+  }
+}
