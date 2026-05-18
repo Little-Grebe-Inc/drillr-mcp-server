@@ -12,11 +12,11 @@ URL: `https://gateway.drillr.ai/mcp/data` · 8 tools · 一把 `drl_*` key 全�
 
 | Tool | 单价 | REST endpoint |
 |---|---|---|
-| [`run_sql`](#run_sql) | 2 cr / call | `POST /api/v1/data/run_sql` |
-| [`sec_report_search`](#sec_report_search) | 2 cr / call | `POST /api/v1/data/sec_report_search` |
-| [`sec_report_list`](#sec_report_list) | 2 cr / call | `GET /api/v1/data/sec_report_list` |
+| [`run_sql`](#run_sql) | 1 cr / call | `POST /api/v1/data/run_sql` |
+| [`sec_report_search`](#sec_report_search) | 1 cr / call | `POST /api/v1/data/sec_report_search` |
+| [`sec_report_list`](#sec_report_list) | 1 cr / call | `GET /api/v1/data/sec_report_list` |
 | [`company_search`](#company_search) | LLM-cost(`max(2, ceil(usd/0.034))`) | `POST /api/v1/data/company_search` |
-| [`signal_list`](#signal_list) | 5 cr / call | `GET /api/v1/data/signal_list` |
+| [`signal_list`](#signal_list) | 2 cr / call | `GET /api/v1/data/signal_list` |
 | [`list_tables`](#list_tables) | Free | `GET /api/v1/data/list_tables` |
 | [`get_table_schema`](#get_table_schema) | Free | `GET /api/v1/data/get_table_schema?table_name=:table` |
 | [`fiscal_utility`](#fiscal_utility) | Free | `GET /api/v1/data/fiscal_utility` |
@@ -59,7 +59,7 @@ Read-only PostgreSQL SELECT against 90+ structured tables. The workhorse of the 
 - No `ROUND(float8, int)` — use `CAST(value AS DECIMAL(10,2))` if rounding is needed
 - Structured-data queries must filter by ticker (`WHERE ticker IN ('AAPL','MSFT')`). Alt-data is macro / industry / patent — no ticker filter required
 
-**Pricing**: 2 cr / call. Mixed-table JOIN follows "strictest multiplier" rule (any alt-data → alt-data rate); both classes are currently flat 2 cr.
+**Pricing**: 1 cr / call, flat across all 90+ tables regardless of how many tables a query JOINs.
 
 **Example call** (price_volume_history):
 
@@ -82,7 +82,7 @@ curl -X POST https://gateway.drillr.ai/api/v1/data/run_sql \
     ],
     "rowCount": 5
   },
-  "_credits": { "charged": 2, "method": "per_call", "balance_after": 505 }
+  "_credits": { "charged": 1, "method": "per_call", "balance_after": 505 }
 }
 ```
 
@@ -140,7 +140,7 @@ Paragraph-level semantic search across SEC filings.
 - 20-F (foreign annual), 6-K (foreign current)
 - S-1 (US IPO registration), F-1 (foreign IPO registration)
 
-**Pricing**: 2 cr / call.
+**Pricing**: 1 cr / call.
 
 **Example call**:
 
@@ -194,7 +194,7 @@ List indexed SEC filings for a ticker, with a summary header.
 | `ticker` | string | Yes | Stock ticker |
 | `filing_types` | string[] | No | Filter by type. Omit for default (periodic reports + IPO/shelf + proxy: 10-K, 10-Q, 20-F, S-1, F-1, S-3, F-3, DEF 14A and /A amendments; excludes 8-K/6-K). Pass `[]` for all indexed types. Pass explicit allowlist like `["8-K"]` to override |
 
-**Pricing**: 2 cr / call.
+**Pricing**: 1 cr / call.
 
 **Example call**:
 
@@ -289,7 +289,7 @@ Recent news + market events filtered by ticker / sector / time range. Each row i
 | `limit` | integer | No | Default 20, max 100 |
 | `offset` | integer | No | Pagination offset, default 0 |
 
-**Pricing**: 5 cr / call.
+**Pricing**: 2 cr / call.
 
 **Coverage**:
 
@@ -322,7 +322,7 @@ curl -G https://gateway.drillr.ai/api/v1/data/signal_list \
       }
     ]
   },
-  "_credits": { "charged": 5, "method": "per_call", "balance_after": 498 }
+  "_credits": { "charged": 2, "method": "per_call", "balance_after": 498 }
 }
 ```
 

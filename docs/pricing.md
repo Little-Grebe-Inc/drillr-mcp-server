@@ -28,14 +28,11 @@
 
 | Tool | 计价方式 | 单价 | 资产类别 | 备注 |
 |---|---|---|---|---|
-| `run_sql`（alt-data 表） | call-base | 2 cr | Alt-data | 24 类独家数据 |
-| `run_sql`（public 表） | call-base | 2 cr | Public | 引流 / SEO 触达 |
-| `signal_list` | call-base | 5 cr | Signal | 30 信源管线 |
-| `sec_report_search` / `sec_report_list` | call-base | 2 cr | SEC | 公开数据 |
+| `run_sql` | call-base | 1 cr | SQL | 90+ 表统一单价（alt-data 与 public 暂不区分） |
+| `signal_list` | call-base | 2 cr | Signal | 跨资产信号管线 |
+| `sec_report_search` / `sec_report_list` | call-base | 1 cr | SEC | 公开数据 |
 | `list_tables` / `get_table_schema` / `fiscal_utility` | free | 0 cr | Meta | 元数据探查，永久免费 |
 | `search`（NL agent）/ `company_search` NL 模式 | LLM-cost | `max(2, ceil(api_cost_usd / 0.034))` | LLM | 按真实 LLM 成本动态计价 |
-
-> **混合查询取严**：`run_sql` SQL JOIN 跨多表时，按所涉及表的最高单价收（alt-data > public）。
 
 ## Referral 计划（概要）
 

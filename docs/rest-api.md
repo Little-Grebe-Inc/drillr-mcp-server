@@ -39,13 +39,13 @@ X-API-Key: drl_xxxxxxxx_xxx...
 | Method | Path | Tool | Cr / call |
 |---|---|---|---|
 | `POST` | `/api/v1/search` | [`search`](#post-apiv1search) | LLM-cost (`max(2, ceil(usd/0.034))`) |
-| `POST` | `/api/v1/data/run_sql` | [`run_sql`](#post-apiv1datarun_sql) | 2 |
+| `POST` | `/api/v1/data/run_sql` | [`run_sql`](#post-apiv1datarun_sql) | 1 |
 | `GET` | `/api/v1/data/list_tables` | [`list_tables`](#get-apiv1datalist_tables) | Free |
 | `GET` | `/api/v1/data/get_table_schema?table_name=:table_name` | [`get_table_schema`](#get-apiv1dataget_table_schema) | Free |
-| `GET` | `/api/v1/data/sec_report_list` | [`sec_report_list`](#get-apiv1datasec_report_list) | 2 |
-| `POST` | `/api/v1/data/sec_report_search` | [`sec_report_search`](#post-apiv1datasec_report_search) | 2 |
+| `GET` | `/api/v1/data/sec_report_list` | [`sec_report_list`](#get-apiv1datasec_report_list) | 1 |
+| `POST` | `/api/v1/data/sec_report_search` | [`sec_report_search`](#post-apiv1datasec_report_search) | 1 |
 | `POST` | `/api/v1/data/company_search` | [`company_search`](#post-apiv1datacompany_search) | LLM-cost (`max(2, ceil(usd/0.034))`) |
-| `GET` | `/api/v1/data/signal_list` | [`signal_list`](#get-apiv1datasignal_list) | 5 |
+| `GET` | `/api/v1/data/signal_list` | [`signal_list`](#get-apiv1datasignal_list) | 2 |
 | `GET` | `/api/v1/data/fiscal_utility` | [`fiscal_utility`](#get-apiv1datafiscal_utility) | Free |
 
 ---
@@ -58,7 +58,7 @@ Every `2xx` response from `/api/v1/*` REST endpoints wraps the payload in a unif
 {
   "data": { /* endpoint-specific payload — object or array */ },
   "_credits": {
-    "charged": 2,
+    "charged": 1,
     "method": "per_call",
     "balance_after": 503
   }
@@ -232,7 +232,7 @@ curl -X POST https://gateway.drillr.ai/api/v1/search \
 
 ### `POST /api/v1/data/run_sql`
 
-**Tool**: `run_sql` · **Server**: drillr-data · **Cost**: 2 cr / call
+**Tool**: `run_sql` · **Server**: drillr-data · **Cost**: 1 cr / call
 
 Read-only PostgreSQL SELECT against 90+ structured tables.
 
@@ -282,7 +282,7 @@ Read-only PostgreSQL SELECT against 90+ structured tables.
     "rowCount": 2
   },
   "_credits": {
-    "charged": 2,
+    "charged": 1,
     "method": "per_call",
     "balance_after": 505
   }
@@ -409,7 +409,7 @@ curl https://gateway.drillr.ai/api/v1/data/get_table_schema?table_name=financial
 
 ### `GET /api/v1/data/sec_report_list`
 
-**Tool**: `sec_report_list` · **Server**: drillr-data · **Cost**: 2 cr / call
+**Tool**: `sec_report_list` · **Server**: drillr-data · **Cost**: 1 cr / call
 
 List indexed SEC filings for a ticker, with a summary header.
 
@@ -457,7 +457,7 @@ List indexed SEC filings for a ticker, with a summary header.
     }
   },
   "_credits": {
-    "charged": 2,
+    "charged": 1,
     "method": "per_call",
     "balance_after": 507
   }
@@ -476,7 +476,7 @@ curl -G https://gateway.drillr.ai/api/v1/data/sec_report_list \
 
 ### `POST /api/v1/data/sec_report_search`
 
-**Tool**: `sec_report_search` · **Server**: drillr-data · **Cost**: 2 cr / call
+**Tool**: `sec_report_search` · **Server**: drillr-data · **Cost**: 1 cr / call
 
 Paragraph-level semantic search across SEC filings.
 
@@ -532,7 +532,7 @@ Paragraph-level semantic search across SEC filings.
     ]
   },
   "_credits": {
-    "charged": 2,
+    "charged": 1,
     "method": "per_call",
     "balance_after": 503
   }
@@ -579,7 +579,7 @@ Qualitative company discovery. **Natural-language input only** — the v1.x SQL 
 
 ### `GET /api/v1/data/signal_list`
 
-**Tool**: `signal_list` · **Server**: drillr-data · **Cost**: 5 cr / call
+**Tool**: `signal_list` · **Server**: drillr-data · **Cost**: 2 cr / call
 
 Recent news + market events feed.
 
@@ -648,7 +648,7 @@ Recent news + market events feed.
     ]
   },
   "_credits": {
-    "charged": 5,
+    "charged": 2,
     "method": "per_call",
     "balance_after": 498
   }
