@@ -151,6 +151,25 @@ curl -X POST https://gateway.drillr.ai/api/v1/data/run_sql \
 - 零售经纪动作（下单 / 管仓）
 - Drillr 不出自家价格预测——只 surface 分析师 consensus
 
+## 社群
+
+用 drillr 搭东西、遇到坑、或者想第一时间拿到新功能?扫码进群,或点标题链接。
+
+<table>
+  <tr>
+    <td align="center"><b>微信中文社群</b></td>
+    <td align="center"><a href="https://discord.gg/YAh96nw5Vh"><b>Discord</b></a></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="https://gateway.drillr.ai/qr/wechat.svg" width="160" alt="Drillr 微信群二维码" /></td>
+    <td align="center"><img src="https://gateway.drillr.ai/qr/discord.svg" width="160" alt="Drillr Discord QR" /></td>
+  </tr>
+  <tr>
+    <td align="center">中文开发者社群,产品反馈最快响应。</td>
+    <td align="center">和一线 agent 开发者交流,office hours、调试支持、抢先体验。</td>
+  </tr>
+</table>
+
 ## License
 
 MIT —— 详见 [`LICENSE`](./LICENSE)。

@@ -148,6 +148,25 @@ We're upfront about edges so your agent doesn't waste research loops:
 - Retail brokerage actions (placing orders, managing positions)
 - drillr does not produce its own price forecasts — we surface analyst consensus
 
+## Community
+
+Building something with drillr, hit a rough edge, or want early-access drops? Come say hi — scan to join, or click the heading link.
+
+<table>
+  <tr>
+    <td align="center"><a href="https://discord.gg/YAh96nw5Vh"><b>Discord</b></a></td>
+    <td align="center"><b>WeChat 中文社群</b></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="https://gateway.drillr.ai/qr/discord.svg" width="160" alt="Drillr Discord QR" /></td>
+    <td align="center"><img src="https://gateway.drillr.ai/qr/wechat.svg" width="160" alt="Drillr WeChat group QR" /></td>
+  </tr>
+  <tr>
+    <td align="center">Devs building agentic research products — office hours, debugging help, early access.</td>
+    <td align="center">中文开发者社群,产品反馈最快响应。</td>
+  </tr>
+</table>
+
 ## License
 
 MIT — see [`LICENSE`](./LICENSE).
