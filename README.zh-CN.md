@@ -157,8 +157,8 @@ curl -X POST https://gateway.drillr.ai/api/v1/data/run_sql \
 
 <table>
   <tr>
-    <td align="center"><b>微信中文社群</b></td>
-    <td align="center"><a href="https://discord.gg/YAh96nw5Vh"><b>Discord</b></a></td>
+    <td align="center" width="50%"><b>微信中文社群</b></td>
+    <td align="center" width="50%"><a href="https://discord.gg/YAh96nw5Vh"><b>Discord</b></a></td>
   </tr>
   <tr>
     <td align="center"><img src="https://gateway.drillr.ai/qr/wechat.svg" width="160" alt="Drillr 微信群二维码" /></td>
