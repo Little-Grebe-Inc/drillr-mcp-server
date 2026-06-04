@@ -1,0 +1,33 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "ai.drillr/drillr",
+  "title": "Drillr — The financial MCP for AI agents",
+  "description": "The financial MCP for AI agents - 90+ financial tables, SEC filings, signals, alt-data.",
+  "version": "2.1.0",
+  "websiteUrl": "https://drillr.ai/?ref=mp_registry",
+  "repository": {
+    "url": "https://github.com/Little-Grebe-Inc/drillr-mcp-server",
+    "source": "github"
+  },
+  "icons": [
+    {
+      "src": "https://drillr.ai/images/brand/logo_512_optimized.png",
+      "mimeType": "image/png",
+      "sizes": ["512x512"]
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://gateway.drillr.ai/mcp/data",
+      "headers": [
+        {
+          "name": "Authorization",
+          "description": "Bearer drl_*. Get a key at https://drillr.ai/developer/keys?ref=mp_registry",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}
