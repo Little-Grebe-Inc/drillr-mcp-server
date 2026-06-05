@@ -10,7 +10,6 @@ The financial MCP for AI agents. Scan markets. Build conviction. Track every sig
 [![MCP](https://img.shields.io/badge/MCP-Streamable_HTTP-F97316?style=flat)](https://modelcontextprotocol.io)
 [![Tools](https://img.shields.io/badge/🛠_Tools-2EA44F?style=flat)](./docs/tools.md)
 [![REST API](https://img.shields.io/badge/🔧_REST_API-0EA5E9?style=flat)](./docs/rest-api.md)
-[![Pricing](https://img.shields.io/badge/💰_Pricing-F59E0B?style=flat)](./docs/pricing.md)
 [![Docs](https://img.shields.io/badge/🌐_Docs-8B5CF6?style=flat)](https://drillr.ai/developer/docs)
 [![Issues](https://img.shields.io/badge/💬_Issues-EC4899?style=flat)](https://github.com/Little-Grebe-Inc/drillr-mcp-server/issues)
 
@@ -94,7 +93,7 @@ What happens under the hood:
 1. Your host routes the question to the `drillr` MCP server
 2. The agent picks the right tools — typically `sec_report_search` (10-Q content) and `run_sql` (financial_statements for margins)
 3. You get back a markdown answer with sources cited, typically in 8-15 seconds
-4. Check your remaining credit balance at [drillr.ai/developer/keys](https://drillr.ai/developer/keys); REST clients additionally get an inline `{ "data": ..., "_credits": ... }` envelope on every 2xx (see [Pricing](./docs/pricing.md) and [REST API › Response Envelope](./docs/rest-api.md#response-envelope)) — MCP responses follow standard JSON-RPC and do not carry per-call credit info inline
+4. Check your remaining credit balance at [drillr.ai/developer/keys](https://drillr.ai/developer/keys); REST clients additionally get an inline `{ "data": ..., "_credits": ... }` envelope on every 2xx (see [REST API › Response Envelope](./docs/rest-api.md#response-envelope)) — MCP responses follow standard JSON-RPC and do not carry per-call credit info inline
 
 ## One Toolkit, 9 Tools
 

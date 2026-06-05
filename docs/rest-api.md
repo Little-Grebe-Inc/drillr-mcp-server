@@ -1,6 +1,6 @@
 # REST API Reference
 
-> MCP 与 REST 等价：用同一份 `drl_*` API key、同样的数据、同样的计费。本文档对应 REST 路径。CLI(`drillr` 命令行)即将推出。
+> MCP 与 REST 等价：用同一份 `drl_*` API key、同样的数据。本文档对应 REST 路径。CLI(`drillr` 命令行)即将推出。
 >
 > Each MCP tool maps 1:1 to a REST endpoint — see [`tools.md`](./tools.md) for tool semantics, params, and what-to-use-when; this doc focuses on HTTP-specific concerns (auth, schemas, rate limits, errors).
 
@@ -36,18 +36,18 @@ X-API-Key: drl_xxxxxxxx_xxx...
 
 ## Endpoint Map
 
-| Method | Path | Tool | Cr / call |
-|---|---|---|---|
-| `POST` | `/api/v1/search` | [`search`](#post-apiv1search) | LLM-cost (`max(2, ceil(usd/0.034))`) |
-| `POST` | `/api/v1/data/run_sql` | [`run_sql`](#post-apiv1datarun_sql) | 1 |
-| `GET` | `/api/v1/data/list_tables` | [`list_tables`](#get-apiv1datalist_tables) | Free |
-| `GET` | `/api/v1/data/get_table_schema?table_name=:table_name` | [`get_table_schema`](#get-apiv1dataget_table_schema) | Free |
-| `GET` | `/api/v1/data/sec_report_list` | [`sec_report_list`](#get-apiv1datasec_report_list) | 1 |
-| `POST` | `/api/v1/data/sec_report_search` | [`sec_report_search`](#post-apiv1datasec_report_search) | 1 |
-| `POST` | `/api/v1/data/company_search` | [`company_search`](#post-apiv1datacompany_search) | LLM-cost (`max(2, ceil(usd/0.034))`) |
-| `POST` | `/api/v1/data/ticker_resolve` | [`ticker_resolve`](#post-apiv1dataticker_resolve) | Free |
-| `GET` | `/api/v1/data/signal_list` | [`signal_list`](#get-apiv1datasignal_list) | 2 |
-| `GET` | `/api/v1/data/fiscal_utility` | [`fiscal_utility`](#get-apiv1datafiscal_utility) | Free |
+| Method | Path | Tool |
+|---|---|---|
+| `POST` | `/api/v1/search` | [`search`](#post-apiv1search) |
+| `POST` | `/api/v1/data/run_sql` | [`run_sql`](#post-apiv1datarun_sql) |
+| `GET` | `/api/v1/data/list_tables` | [`list_tables`](#get-apiv1datalist_tables) |
+| `GET` | `/api/v1/data/get_table_schema?table_name=:table_name` | [`get_table_schema`](#get-apiv1dataget_table_schema) |
+| `GET` | `/api/v1/data/sec_report_list` | [`sec_report_list`](#get-apiv1datasec_report_list) |
+| `POST` | `/api/v1/data/sec_report_search` | [`sec_report_search`](#post-apiv1datasec_report_search) |
+| `POST` | `/api/v1/data/company_search` | [`company_search`](#post-apiv1datacompany_search) |
+| `POST` | `/api/v1/data/ticker_resolve` | [`ticker_resolve`](#post-apiv1dataticker_resolve) |
+| `GET` | `/api/v1/data/signal_list` | [`signal_list`](#get-apiv1datasignal_list) |
+| `GET` | `/api/v1/data/fiscal_utility` | [`fiscal_utility`](#get-apiv1datafiscal_utility) |
 
 ---
 
@@ -75,8 +75,6 @@ Every `2xx` response from `/api/v1/*` REST endpoints wraps the payload in a unif
 | `charged` | integer | Credits deducted for this call. `0` for free tools. |
 | `method` | string | Billing model: `per_call` (fixed per-request) / `usage_based` (LLM-driven, scales with upstream cost) / `free` |
 | `balance_after` | integer | Credit balance after this call (`monthly_remaining + purchased_remaining`; may be negative when overdrafted) |
-
-See [`pricing.md`](./pricing.md) for the Tier × Tool cost matrix.
 
 ---
 
@@ -156,7 +154,7 @@ The `error` object may also include extra fields specific to the error class (e.
 
 ### `POST /api/v1/search`
 
-**Tool**: `search` (REST-only; the v2.0.2 `/mcp/search` MCP server was retired on 2026-05-12) · **Cost**: LLM-cost based — `max(2, ceil(api_cost_usd / 0.034))` cr / call
+**Tool**: `search` (REST-only; the v2.0.2 `/mcp/search` MCP server was retired on 2026-05-12)
 
 Multi-step research with auto-citation. Drillr orchestrates the agent loop internally and returns a thesis-quality answer with sources cited.
 
@@ -233,7 +231,7 @@ curl -X POST https://gateway.drillr.ai/api/v1/search \
 
 ### `POST /api/v1/data/run_sql`
 
-**Tool**: `run_sql` · **Server**: drillr-data · **Cost**: 1 cr / call
+**Tool**: `run_sql` · **Server**: drillr-data
 
 Read-only PostgreSQL SELECT against 90+ structured tables.
 
@@ -303,7 +301,7 @@ curl -X POST https://gateway.drillr.ai/api/v1/data/run_sql \
 
 ### `GET /api/v1/data/list_tables`
 
-**Tool**: `list_tables` · **Server**: drillr-data · **Cost**: Free
+**Tool**: `list_tables` · **Server**: drillr-data
 
 List alternative-data tables under given categories. Returns each table's name, one-line purpose, column names.
 
@@ -357,7 +355,7 @@ curl -G https://gateway.drillr.ai/api/v1/data/list_tables \
 
 ### `GET /api/v1/data/get_table_schema?table_name=:table_name`
 
-**Tool**: `get_table_schema` · **Server**: drillr-data · **Cost**: Free
+**Tool**: `get_table_schema` · **Server**: drillr-data
 
 Look up column definitions for a specific table.
 
@@ -410,7 +408,7 @@ curl https://gateway.drillr.ai/api/v1/data/get_table_schema?table_name=financial
 
 ### `GET /api/v1/data/sec_report_list`
 
-**Tool**: `sec_report_list` · **Server**: drillr-data · **Cost**: 1 cr / call
+**Tool**: `sec_report_list` · **Server**: drillr-data
 
 List indexed SEC filings for a ticker, with a summary header.
 
@@ -477,7 +475,7 @@ curl -G https://gateway.drillr.ai/api/v1/data/sec_report_list \
 
 ### `POST /api/v1/data/sec_report_search`
 
-**Tool**: `sec_report_search` · **Server**: drillr-data · **Cost**: 1 cr / call
+**Tool**: `sec_report_search` · **Server**: drillr-data
 
 Paragraph-level semantic search across SEC filings.
 
@@ -544,7 +542,7 @@ Paragraph-level semantic search across SEC filings.
 
 ### `POST /api/v1/data/company_search`
 
-**Tool**: `company_search` · **Server**: drillr-data · **Cost**: LLM-cost based — `max(2, ceil(api_cost_usd / 0.034))` cr / call
+**Tool**: `company_search` · **Server**: drillr-data
 
 Qualitative company discovery. **Natural-language input only** — the v1.x SQL mode is retired in v2.0; for column-level filtering use [`POST /api/v1/data/run_sql`](#post-apiv1datarun_sql) on `company_snapshot`.
 
@@ -580,7 +578,7 @@ Qualitative company discovery. **Natural-language input only** — the v1.x SQL 
 
 ### `POST /api/v1/data/ticker_resolve`
 
-**Tool**: `ticker_resolve` · **Server**: drillr-data · **Cost**: Free
+**Tool**: `ticker_resolve` · **Server**: drillr-data
 
 Resolve a company name, brand, or ticker substring to canonical ticker(s). Call this FIRST when the user mentions a company by name / brand / nickname before running any ticker-keyed tool.
 
@@ -630,7 +628,7 @@ Returns up to 5 matches ranked by prefix-hit first, then name length.
 
 ### `GET /api/v1/data/signal_list`
 
-**Tool**: `signal_list` · **Server**: drillr-data · **Cost**: 2 cr / call
+**Tool**: `signal_list` · **Server**: drillr-data
 
 Recent news + market events feed.
 
@@ -719,7 +717,7 @@ curl -G https://gateway.drillr.ai/api/v1/data/signal_list \
 
 ### `GET /api/v1/data/fiscal_utility`
 
-**Tool**: `fiscal_utility` · **Server**: drillr-data · **Cost**: Free
+**Tool**: `fiscal_utility` · **Server**: drillr-data
 
 Bidirectional fiscal year ↔ calendar month conversion.
 
@@ -783,6 +781,5 @@ Use it to generate clients in your language (`openapi-generator` / `openapi-type
 ## See Also
 
 - 🛠 [Tool Reference](./tools.md) — tool semantics, when-to-use, parameter details, sibling-tool routing
-- 💰 [Pricing](./pricing.md) — Tier 总览 / 差异 / 单价矩阵 / Referral
 - 🌐 [Developer Portal](https://drillr.ai/developer/docs) — Web docs with interactive try-it-out
 - 💬 [Issues & feedback](https://github.com/Little-Grebe-Inc/drillr-mcp-server/issues)

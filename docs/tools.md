@@ -1,26 +1,26 @@
 # Tool Reference
 
-> drillr 对外的 8 个 MCP tool 完整参考手册。每个 tool 一段：用途、参数、调用示例、返回样本、常见陷阱、sibling tool 指引。
+> drillr 对外的 9 个 MCP tool 完整参考手册。每个 tool 一段：用途、参数、调用示例、返回样本、常见陷阱、sibling tool 指引。
 >
-> **MCP 与 REST 等价**：MCP tools/call 与 REST endpoint 走同一份 `drl_*` API key、同样的数据、同样的计费。下面示例用 REST（最易在终端跑）；通过 MCP 调时把参数包成 `tools/call` 的 `arguments` 字段即可。
+> **MCP 与 REST 等价**：MCP tools/call 与 REST endpoint 走同一份 `drl_*` API key、同样的数据。下面示例用 REST（最易在终端跑）；通过 MCP 调时把参数包成 `tools/call` 的 `arguments` 字段即可。
 >
 > **CLI(`drillr` 命令行)即将推出。**
 
 ## 目录
 
-URL: `https://gateway.drillr.ai/mcp/data` · 8 tools · 一把 `drl_*` key 全部走通。
+URL: `https://gateway.drillr.ai/mcp/data` · 9 tools · 一把 `drl_*` key 全部走通。
 
-| Tool | 单价 | REST endpoint |
-|---|---|---|
-| [`run_sql`](#run_sql) | 1 cr / call | `POST /api/v1/data/run_sql` |
-| [`sec_report_search`](#sec_report_search) | 1 cr / call | `POST /api/v1/data/sec_report_search` |
-| [`sec_report_list`](#sec_report_list) | 1 cr / call | `GET /api/v1/data/sec_report_list` |
-| [`company_search`](#company_search) | LLM-cost(`max(2, ceil(usd/0.034))`) | `POST /api/v1/data/company_search` |
-| [`ticker_resolve`](#ticker_resolve) | Free | `POST /api/v1/data/ticker_resolve` |
-| [`signal_list`](#signal_list) | 2 cr / call | `GET /api/v1/data/signal_list` |
-| [`list_tables`](#list_tables) | Free | `GET /api/v1/data/list_tables` |
-| [`get_table_schema`](#get_table_schema) | Free | `GET /api/v1/data/get_table_schema?table_name=:table` |
-| [`fiscal_utility`](#fiscal_utility) | Free | `GET /api/v1/data/fiscal_utility` |
+| Tool | REST endpoint |
+|---|---|
+| [`run_sql`](#run_sql) | `POST /api/v1/data/run_sql` |
+| [`sec_report_search`](#sec_report_search) | `POST /api/v1/data/sec_report_search` |
+| [`sec_report_list`](#sec_report_list) | `GET /api/v1/data/sec_report_list` |
+| [`company_search`](#company_search) | `POST /api/v1/data/company_search` |
+| [`ticker_resolve`](#ticker_resolve) | `POST /api/v1/data/ticker_resolve` |
+| [`signal_list`](#signal_list) | `GET /api/v1/data/signal_list` |
+| [`list_tables`](#list_tables) | `GET /api/v1/data/list_tables` |
+| [`get_table_schema`](#get_table_schema) | `GET /api/v1/data/get_table_schema?table_name=:table` |
+| [`fiscal_utility`](#fiscal_utility) | `GET /api/v1/data/fiscal_utility` |
 
 **Recommended workflow**:
 
@@ -60,7 +60,6 @@ Read-only PostgreSQL SELECT against 90+ structured tables. The workhorse of the 
 - No `ROUND(float8, int)` — use `CAST(value AS DECIMAL(10,2))` if rounding is needed
 - Structured-data queries must filter by ticker (`WHERE ticker IN ('AAPL','MSFT')`). Alt-data is macro / industry / patent — no ticker filter required
 
-**Pricing**: 1 cr / call, flat across all 90+ tables regardless of how many tables a query JOINs.
 
 **Example call** (price_volume_history):
 
@@ -141,7 +140,6 @@ Paragraph-level semantic search across SEC filings.
 - 20-F (foreign annual), 6-K (foreign current)
 - S-1 (US IPO registration), F-1 (foreign IPO registration)
 
-**Pricing**: 1 cr / call.
 
 **Example call**:
 
@@ -195,7 +193,6 @@ List indexed SEC filings for a ticker, with a summary header.
 | `ticker` | string | Yes | Stock ticker |
 | `filing_types` | string[] | No | Filter by type. Omit for default (periodic reports + IPO/shelf + proxy: 10-K, 10-Q, 20-F, S-1, F-1, S-3, F-3, DEF 14A and /A amendments; excludes 8-K/6-K). Pass `[]` for all indexed types. Pass explicit allowlist like `["8-K"]` to override |
 
-**Pricing**: 1 cr / call.
 
 **Example call**:
 
@@ -244,7 +241,6 @@ Qualitative company discovery — industry classification, business model, suppl
 |---|---|---|---|
 | `query` | string | Yes | Natural-language description of the companies you're looking for (e.g. "lithium-ion battery cell makers supplying European OEMs"). Do not pass SQL. |
 
-**Pricing**: LLM-cost based — `max(2, ceil(api_cost_usd / 0.034))` cr / call.
 
 **Example call**:
 
@@ -287,7 +283,6 @@ Resolve a company name, brand, or ticker substring to canonical ticker(s). Use t
 | `query` | string | Yes | Company name or ticker substring (case-insensitive, supports multilingual incl. Chinese). Matches historical names + tickers too. |
 | `market` | string | No | Optional market filter: `"us"` \| `"jp"`. Omit to search both markets. |
 
-**Pricing**: Free.
 
 **Example call**:
 
@@ -327,7 +322,6 @@ Recent news + market events filtered by ticker / sector / time range. Each row i
 | `limit` | integer | No | Default 20, max 100 |
 | `offset` | integer | No | Pagination offset, default 0 |
 
-**Pricing**: 2 cr / call.
 
 **Coverage**:
 
@@ -375,7 +369,6 @@ List alternative-data tables under given categories. Returns each table's name, 
 - BEFORE [`run_sql`](#run_sql) when exploring alt-data — `run_sql` alone won't tell you which tables exist
 - Discovering what's in a category you don't know yet
 
-**Pricing**: Free; call freely.
 
 **Parameters**:
 
@@ -431,7 +424,6 @@ Look up column definitions (name, type, description) for a specific table.
 - BEFORE [`run_sql`](#run_sql) when you're unsure which columns a table has
 - Verifying column types before constructing a JOIN
 
-**Pricing**: Free; call freely.
 
 **Parameters**:
 
@@ -471,7 +463,6 @@ Bidirectional fiscal year ↔ calendar month conversion. Different companies hav
 - Converting "Nvidia Q3 FY2026" → calendar months (Aug 2025 - Oct 2025)
 - Converting "what fiscal quarter is 2025-08 for Nvidia" → FY2026 Q3
 
-**Pricing**: Free; call freely.
 
 **Parameters**:
 
@@ -512,4 +503,3 @@ For the full list of structured tables, categories, ticker conventions, and what
 
 - [Developer docs / data coverage](https://drillr.ai/developer/docs/coverage)
 - [REST API reference](./rest-api.md) — endpoint-by-endpoint, plus the `{ data, _credits }` envelope contract
-- [Pricing](./pricing.md) — Tier 总览 / 差异 / 单价矩阵 / Referral

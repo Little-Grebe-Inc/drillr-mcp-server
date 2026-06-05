@@ -10,7 +10,6 @@
 [![MCP](https://img.shields.io/badge/MCP-Streamable_HTTP-F97316?style=flat)](https://modelcontextprotocol.io)
 [![工具参考](https://img.shields.io/badge/🛠_工具参考-2EA44F?style=flat)](./docs/tools.md)
 [![REST API](https://img.shields.io/badge/🔧_REST_API-0EA5E9?style=flat)](./docs/rest-api.md)
-[![定价](https://img.shields.io/badge/💰_定价-F59E0B?style=flat)](./docs/pricing.md)
 [![开发者文档](https://img.shields.io/badge/🌐_开发者文档-8B5CF6?style=flat)](https://drillr.ai/developer/docs)
 [![反馈](https://img.shields.io/badge/💬_反馈-EC4899?style=flat)](https://github.com/Little-Grebe-Inc/drillr-mcp-server/issues)
 
@@ -98,7 +97,7 @@ Listing：https://smithery.ai/servers/drillr/drillr
 1. Host 把问题路由给 `drillr` MCP server
 2. Agent 自己挑工具——通常是 `sec_report_search`（拿 10-Q 内容）+ `run_sql`（查 financial_statements 拿毛利率）+ `company_search`（拿业务分部定义）
 3. 你拿回带引用的 markdown 回答，一般 8-15 秒
-4. 在 [drillr.ai/developer/keys](https://drillr.ai/developer/keys) 查看 credit 余额;REST 调用额外在每次 2xx 响应里内联 `{ "data": ..., "_credits": ... }` envelope(详见 [定价](./docs/pricing.md) 和 [REST API › Response Envelope](./docs/rest-api.md#response-envelope)) —— MCP 响应走标准 JSON-RPC,不在响应里携带 per-call 计费字段
+4. 在 [drillr.ai/developer/keys](https://drillr.ai/developer/keys) 查看 credit 余额;REST 调用额外在每次 2xx 响应里内联 `{ "data": ..., "_credits": ... }` envelope(详见 [REST API › Response Envelope](./docs/rest-api.md#response-envelope)) —— MCP 响应走标准 JSON-RPC,不在响应里携带 per-call 计费字段
 
 ## 一个 Toolkit，9 个工具
 
