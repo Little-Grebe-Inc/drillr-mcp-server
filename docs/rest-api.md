@@ -45,6 +45,7 @@ X-API-Key: drl_xxxxxxxx_xxx...
 | `GET` | `/api/v1/data/sec_report_list` | [`sec_report_list`](#get-apiv1datasec_report_list) | 1 |
 | `POST` | `/api/v1/data/sec_report_search` | [`sec_report_search`](#post-apiv1datasec_report_search) | 1 |
 | `POST` | `/api/v1/data/company_search` | [`company_search`](#post-apiv1datacompany_search) | LLM-cost (`max(2, ceil(usd/0.034))`) |
+| `POST` | `/api/v1/data/ticker_resolve` | [`ticker_resolve`](#post-apiv1dataticker_resolve) | Free |
 | `GET` | `/api/v1/data/signal_list` | [`signal_list`](#get-apiv1datasignal_list) | 2 |
 | `GET` | `/api/v1/data/fiscal_utility` | [`fiscal_utility`](#get-apiv1datafiscal_utility) | Free |
 
@@ -574,6 +575,56 @@ Qualitative company discovery. **Natural-language input only** — the v1.x SQL 
   "_credits": { "charged": 5, "method": "usage_based", "balance_after": 498 }
 }
 ```
+
+---
+
+### `POST /api/v1/data/ticker_resolve`
+
+**Tool**: `ticker_resolve` · **Server**: drillr-data · **Cost**: Free
+
+Resolve a company name, brand, or ticker substring to canonical ticker(s). Call this FIRST when the user mentions a company by name / brand / nickname before running any ticker-keyed tool.
+
+**Request body**:
+
+```json
+{ "query": "苹果" }
+```
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `query` | string | Yes | Company name or ticker substring (case-insensitive, supports multilingual incl. Chinese). Matches historical names + tickers too. |
+| `market` | string | No | Optional market filter: `"us"` \| `"jp"`. Omit to search both markets. |
+
+**Example**:
+
+```bash
+curl -X POST https://gateway.drillr.ai/api/v1/data/ticker_resolve \
+  -H "Authorization: Bearer $DRILLR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "苹果"}'
+```
+
+**Response**:
+
+```json
+{
+  "data": {
+    "results": [
+      {
+        "company_name": "Apple Inc.",
+        "tickers": [{ "ticker": "AAPL", "valid_from": "unknown", "valid_to": "present" }]
+      },
+      {
+        "company_name": "APPLE INTERNATIONAL CO.,LTD.",
+        "tickers": [{ "ticker": "2788.T", "valid_from": "unknown", "valid_to": "present" }]
+      }
+    ]
+  },
+  "_credits": { "charged": "0.0", "method": "free", "balance_after": "9213.6" }
+}
+```
+
+Returns up to 5 matches ranked by prefix-hit first, then name length.
 
 ---
 

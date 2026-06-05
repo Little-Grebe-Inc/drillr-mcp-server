@@ -31,7 +31,7 @@
 | `run_sql` | call-base | 1 cr | SQL | 90+ 表统一单价（alt-data 与 public 暂不区分） |
 | `signal_list` | call-base | 2 cr | Signal | 跨资产信号管线 |
 | `sec_report_search` / `sec_report_list` | call-base | 1 cr | SEC | 公开数据 |
-| `list_tables` / `get_table_schema` / `fiscal_utility` | free | 0 cr | Meta | 元数据探查，永久免费 |
+| `list_tables` / `get_table_schema` / `fiscal_utility` / `ticker_resolve` | free | 0 cr | Meta | 元数据探查 + ticker 解析,永久免费 |
 | `search`（NL agent）/ `company_search` NL 模式 | LLM-cost | `max(2, ceil(api_cost_usd / 0.034))` | LLM | 按真实 LLM 成本动态计价 |
 
 ## Referral 计划（概要）

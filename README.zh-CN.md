@@ -100,18 +100,19 @@ Listing：https://smithery.ai/servers/drillr/drillr
 3. 你拿回带引用的 markdown 回答，一般 8-15 秒
 4. 在 [drillr.ai/developer/keys](https://drillr.ai/developer/keys) 查看 credit 余额;REST 调用额外在每次 2xx 响应里内联 `{ "data": ..., "_credits": ... }` envelope(详见 [定价](./docs/pricing.md) 和 [REST API › Response Envelope](./docs/rest-api.md#response-envelope)) —— MCP 响应走标准 JSON-RPC,不在响应里携带 per-call 计费字段
 
-## 一个 Toolkit，8 个工具
+## 一个 Toolkit，9 个工具
 
-Drillr 用一个 MCP endpoint 暴露 8 个工具——你的 agent 按需组合：
+Drillr 用一个 MCP endpoint 暴露 9 个工具——你的 agent 按需组合：
 
 | 工具 | 用途 |
 |---|---|
 | `run_sql` | 90+ 张表的标准化财务数据——三大表、比率、业绩、内部交易、股东结构、行情、另类数据 |
 | `sec_report_search` | 10-K / 10-Q / 20-F / 6-K / S-1 / DEF 14A 文件的段落级语义检索 |
-| `sec_report_list` | 按 ticker / 表单类型 / 日期范围列出文件 |
-| `company_search` | 解析 ticker、业务分部、可比公司、按市值和上市地筛选 |
+| `sec_report_list` | 按 ticker / 表单类型 / 日期范围列出某标的的文件 |
+| `company_search` | 按自然语言描述找公司——业务模式、供应链、可比公司、主题（如"给特斯拉供货的电池厂商"） |
 | `signal_list` | ~6,900 个标的的实时跨资产信号流 |
-| `list_tables` | 列出可用的 SQL 表 |
+| `ticker_resolve` | 把公司名 / 品牌 / ticker 片段解析成规范 ticker（任何按 ticker 取数的工具之前先调它） |
+| `list_tables` | 按类目列出可用的另类数据 SQL 表 |
 | `get_table_schema` | 看任意 SQL 表的列和类型 |
 | `fiscal_utility` | 财年 / 财季工具（处理非自然年公司的 FY/FQ 解析） |
 

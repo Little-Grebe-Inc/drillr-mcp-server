@@ -16,6 +16,7 @@ URL: `https://gateway.drillr.ai/mcp/data` · 8 tools · 一把 `drl_*` key 全�
 | [`sec_report_search`](#sec_report_search) | 1 cr / call | `POST /api/v1/data/sec_report_search` |
 | [`sec_report_list`](#sec_report_list) | 1 cr / call | `GET /api/v1/data/sec_report_list` |
 | [`company_search`](#company_search) | LLM-cost(`max(2, ceil(usd/0.034))`) | `POST /api/v1/data/company_search` |
+| [`ticker_resolve`](#ticker_resolve) | Free | `POST /api/v1/data/ticker_resolve` |
 | [`signal_list`](#signal_list) | 2 cr / call | `GET /api/v1/data/signal_list` |
 | [`list_tables`](#list_tables) | Free | `GET /api/v1/data/list_tables` |
 | [`get_table_schema`](#get_table_schema) | Free | `GET /api/v1/data/get_table_schema?table_name=:table` |
@@ -261,6 +262,43 @@ curl -X POST https://gateway.drillr.ai/api/v1/data/company_search \
 - Management background, customer profile
 
 Returns a structured list of matching companies with context snippets.
+
+---
+
+### `ticker_resolve`
+
+Resolve a company name, brand, or ticker substring to canonical ticker(s). Use this FIRST when the user mentions a company by name / brand / nickname before running any ticker-keyed tool.
+
+**When to use**:
+
+- User mentions a company by name (e.g. "Apple", "苹果", "OpenAI", "Tesla") and you need the canonical ticker before calling [`sec_report_search`](#sec_report_search) / [`sec_report_list`](#sec_report_list) / [`run_sql`](#run_sql)
+- Mapping historical / former names to current ticker
+- Disambiguating between similar-sounding companies — top 5 ranked matches help the agent pick
+
+**When NOT to use**:
+
+- User already gave you the ticker directly — skip this, go straight to the keyed tool
+- Looking for companies *by description* (industry, business model, supply chain) — use [`company_search`](#company_search) instead
+
+**Parameters**:
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `query` | string | Yes | Company name or ticker substring (case-insensitive, supports multilingual incl. Chinese). Matches historical names + tickers too. |
+| `market` | string | No | Optional market filter: `"us"` \| `"jp"`. Omit to search both markets. |
+
+**Pricing**: Free.
+
+**Example call**:
+
+```bash
+curl -X POST https://gateway.drillr.ai/api/v1/data/ticker_resolve \
+  -H "Authorization: Bearer $DRILLR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "苹果"}'
+```
+
+Returns up to 5 matches ranked by prefix-hit first, then name length.
 
 ---
 

@@ -96,18 +96,19 @@ What happens under the hood:
 3. You get back a markdown answer with sources cited, typically in 8-15 seconds
 4. Check your remaining credit balance at [drillr.ai/developer/keys](https://drillr.ai/developer/keys); REST clients additionally get an inline `{ "data": ..., "_credits": ... }` envelope on every 2xx (see [Pricing](./docs/pricing.md) and [REST API › Response Envelope](./docs/rest-api.md#response-envelope)) — MCP responses follow standard JSON-RPC and do not carry per-call credit info inline
 
-## One Toolkit, 8 Tools
+## One Toolkit, 9 Tools
 
-drillr exposes a single MCP endpoint with 8 tools — an all-in-one toolkit for most financial research workflows:
+drillr exposes a single MCP endpoint with 9 tools — an all-in-one toolkit for most financial research workflows:
 
 | Tool                | Purpose                                                                                                          |
 | ------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | `run_sql`           | Standardized financial data over 90+ tables — statements, ratios, earnings, insider, ownership, prices, alt-data |
 | `sec_report_search` | Paragraph-level semantic search over 10-K / 10-Q / 20-F / 6-K / S-1 / DEF 14A filings                            |
-| `sec_report_list`   | List filings by ticker, form type, and date range                                                                |
-| `company_search`    | Resolve tickers, segments, peers, market-cap and listing filters                                                 |
-| `signal_list`       | Live cross-asset signal feed                                                                                     |
-| `list_tables`       | Discover available SQL tables                                                                                    |
+| `sec_report_list`   | List a ticker's indexed filings by form type and date range                                                      |
+| `company_search`    | Qualitative company discovery by description — business model, supply chain, peers, theme ("EV battery suppliers to Tesla") |
+| `signal_list`       | Live cross-asset signal feed across ~6,900 tickers                                                               |
+| `ticker_resolve`    | Resolve a company name / brand / ticker substring → canonical ticker (call first before any ticker-keyed tool)   |
+| `list_tables`       | Discover available alt-data SQL tables by category                                                               |
 | `get_table_schema`  | Inspect columns and types for any SQL table                                                                      |
 | `fiscal_utility`    | Fiscal-period helpers (FY/FQ resolution across companies with non-calendar years)                                |
 
