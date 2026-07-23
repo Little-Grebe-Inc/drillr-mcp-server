@@ -1,11 +1,11 @@
 name: drillr-data
 displayName: Drillr Data — financial data backend
 description: |
-  Drillr's 8-tool data backend for AI agents. SQL over 90+ standardized
+  Drillr's 9-tool data backend for AI agents. SQL over 90+ standardized
   financial tables (statements, ratios, earnings, insider, ownership,
-  prices) plus paragraph-level SEC filing search and 24 alt-data
-  categories. US + Japan equities and ADRs of global companies,
-  fundamentals back to the 1980s.
+  prices), semantic news search, company-filing search, and 24 alt-data
+  categories. Core equity coverage spans the US, Japan, Hong Kong, and
+  China A-shares, with fundamentals back to the 1980s.
 homepage: https://drillr.ai
 repository: https://github.com/Little-Grebe-Inc/drillr-mcp-server
 license: MIT

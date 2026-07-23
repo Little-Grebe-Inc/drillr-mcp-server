@@ -15,7 +15,7 @@ The financial MCP for AI agents. Scan markets. Build conviction. Track every sig
 
 </div>
 
-One API key. Five tools for every research workflow: thesis search engine, standardized financial data (statements, ratios, earnings, insider, ownership), live signals, paragraph-cited SEC filing search, alt-data.
+One API key. Nine tools for agent research: standardized financial data, company discovery, semantic news and event search, paragraph-cited company filings, and alt-data.
 
 > ⭐ **If drillr helps your agent, star us — that's how we know to keep building this in the open.**
 
@@ -60,7 +60,7 @@ mcp_servers:
 
 #### Other hosts
 
-Any MCP-compatible host (OpenClaw, ChatGPT MCP, etc.) — same Streamable HTTP transport, same Bearer header. Authentication is Bearer API key only.
+Any MCP-compatible host (OpenClaw, ChatGPT MCP, etc.) — same Streamable HTTP transport. A Bearer API key is the recommended setup. Clients with MCP OAuth support can instead omit the `headers` block and complete the browser sign-in flow.
 
 ### Option B: Smithery one-line
 
@@ -102,11 +102,11 @@ drillr exposes a single MCP endpoint with 9 tools — an all-in-one toolkit for 
 | Tool                | Purpose                                                                                                          |
 | ------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | `run_sql`           | Standardized financial data over 90+ tables — statements, ratios, earnings, insider, ownership, prices, alt-data |
-| `sec_report_search` | Paragraph-level semantic search over 10-K / 10-Q / 20-F / 6-K / S-1 / DEF 14A filings                            |
-| `sec_report_list`   | List a ticker's indexed filings by form type and date range                                                      |
-| `company_search`    | Qualitative company discovery by description — business model, supply chain, peers, theme ("EV battery suppliers to Tesla") |
-| `signal_list`       | Live cross-asset signal feed across ~6,900 tickers                                                               |
-| `ticker_resolve`    | Resolve a company name / brand / ticker substring → canonical ticker (call first before any ticker-keyed tool)   |
+| `sec_report_search` | Paragraph-level semantic search across company filings in the US, Japan, Hong Kong, and China A-shares            |
+| `sec_report_list`   | List a ticker's indexed filings by filing type                                                                   |
+| `company_search`    | Four-market qualitative discovery by business model, supply chain, peers, or theme                              |
+| `news_search`       | Semantic search over news, market events, and attributed claims, grouped into storylines                        |
+| `ticker_lookup`     | Resolve a company name, brand, or ticker substring to ticker history                                             |
 | `list_tables`       | Discover available alt-data SQL tables by category                                                               |
 | `get_table_schema`  | Inspect columns and types for any SQL table                                                                      |
 | `fiscal_utility`    | Fiscal-period helpers (FY/FQ resolution across companies with non-calendar years)                                |
@@ -115,14 +115,14 @@ Full tool reference: [`docs/tools.md`](./docs/tools.md).
 
 ## What's Covered
 
-- **Global equities**: US + Japan. Hong Kong / A-shares / Korea native listings coming soon.
+- **Core equity coverage**: US, Japan, Hong Kong, and China A-shares. Ticker formats: `AAPL`, `6758.T`, `00700.HK`, `600519.SH` / `300750.SZ`.
 - **Ontology-based Company Search**: Search over the universe of equities with business model descriptions, supply chain positions, growth vector or thematic fit. 
-- **Fundamentals**: financials back to the 1980s, 90+ structured tables (income statement, balance sheet, cash flow, ratios, growth, valuation)
-- **SEC filings**: 10-K / 10-Q / 20-F / 6-K / S-1 / DEF 14A with paragraph-level semantic search
-- **Earnings**: call transcripts with AI-structured summaries (guidance, risks, segments, Q&A), full estimate-vs-actuals history
+- **Fundamentals**: `financial_statements`, `company_snapshot`, and `price_volume_history` cover all four core markets; financial history reaches back to the 1980s
+- **Company filings**: SEC EDGAR, Japan EDINET, HKEX, and China A-share reports with paragraph-level semantic search
+- **Earnings**: call transcripts with AI-structured summaries and estimate-vs-actuals history; this specialized dataset covers US + Japan
 - **Markets**: equities, ETFs, indices, forex, crypto, commodities
-- **Analyst coverage**: rating events and consensus from major sell-side firms
-- **News + signals**: continuously-updating cross-asset feed (equities, macro, geopolitics, commodities, crypto)
+- **Specialized US datasets**: analyst ratings, ownership, executives, 8-K events, and extended-hours quotes
+- **News + events**: continuously updating four-market and cross-asset search with story grouping and attributed claims
 - **AI value chain alt-data**: energy & power, data centers, semiconductors, compute pricing, AI models / companies / benchmarks, LLM token pricing, macro & trade, prediction markets, critical minerals
 
 Full data dictionary: [`docs/tools.md`](./docs/tools.md).

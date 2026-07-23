@@ -15,7 +15,7 @@
 
 </div>
 
-一把 API key。五类工具覆盖每种研究流程：thesis 搜索引擎、标准化财务数据（财报、比率、业绩、内部交易、股东结构）、实时信号、段落级引用的文件检索、另类数据。
+一把 API key，9 个工具覆盖 Agent 研究：标准化财务数据、公司发现、新闻与事件语义检索、带段落引用的公司披露检索，以及另类数据。
 
 > ⭐ **如果 Drillr 帮到了你的 agent，给我们点个 Star——这是我们持续 in the open 迭代的信号。**
 
@@ -64,7 +64,7 @@ mcp_servers:
 
 #### 其他 host
 
-任何支持 MCP 的 host（OpenClaw / ChatGPT MCP 等）都能用——同一套 Streamable HTTP transport + Bearer header。鉴权仅支持 Bearer API key；该 endpoint 不支持 OAuth。
+任何支持 MCP 的 host（OpenClaw / ChatGPT MCP 等）都能用——同一套 Streamable HTTP transport。推荐使用 Bearer API key；支持 MCP OAuth 的客户端也可以删掉 `headers` 配置，通过浏览器完成登录。
 
 ### 方式 B：Smithery 一行装
 
@@ -106,11 +106,11 @@ Drillr 用一个 MCP endpoint 暴露 9 个工具——你的 agent 按需组合�
 | 工具 | 用途 |
 |---|---|
 | `run_sql` | 90+ 张表的标准化财务数据——三大表、比率、业绩、内部交易、股东结构、行情、另类数据 |
-| `sec_report_search` | 10-K / 10-Q / 20-F / 6-K / S-1 / DEF 14A 文件的段落级语义检索 |
-| `sec_report_list` | 按 ticker / 表单类型 / 日期范围列出某标的的文件 |
-| `company_search` | 按自然语言描述找公司——业务模式、供应链、可比公司、主题（如"给特斯拉供货的电池厂商"） |
-| `signal_list` | ~6,900 个标的的实时跨资产信号流 |
-| `ticker_resolve` | 把公司名 / 品牌 / ticker 片段解析成规范 ticker（任何按 ticker 取数的工具之前先调它） |
+| `sec_report_search` | 检索美股、日股、港股和 A 股公司披露文件中的段落 |
+| `sec_report_list` | 按 ticker / 文件类型列出已收录的公司披露 |
+| `company_search` | 在四个市场中按业务模式、供应链、可比公司或主题找公司 |
+| `news_search` | 语义检索新闻、市场事件和带归属的观点，并按 storyline 聚合 |
+| `ticker_lookup` | 把公司名、品牌或 ticker 片段解析成 ticker 历史 |
 | `list_tables` | 按类目列出可用的另类数据 SQL 表 |
 | `get_table_schema` | 看任意 SQL 表的列和类型 |
 | `fiscal_utility` | 财年 / 财季工具（处理非自然年公司的 FY/FQ 解析） |
@@ -119,13 +119,13 @@ Drillr 用一个 MCP endpoint 暴露 9 个工具——你的 agent 按需组合�
 
 ## 数据覆盖
 
-- **全球股票**：美股 + 日股已支持；港股 / A 股 / 韩股本土上市即将上线。中概股、欧洲公司的美股 ADR（BABA / TSM / BIDU / JD / NIO / PDD 等）基本面齐全
-- **基本面**：财报数据回溯到 1980 年代，90+ 张结构化表（利润表、资产负债表、现金流、估值、增长、比率）
-- **SEC 文件**：10-K / 10-Q / 20-F / 6-K / S-1 / DEF 14A，段落级语义检索
-- **业绩**：电话会 transcript + AI 结构化摘要（guidance / risks / 业务分部 / Q&A）、完整的 estimate vs actuals 历史
+- **核心股票覆盖**：美股、日股、港股和 A 股；ticker 格式分别为 `AAPL`、`6758.T`、`00700.HK`、`600519.SH` / `300750.SZ`
+- **基本面**：`financial_statements`、`company_snapshot`、`price_volume_history` 覆盖四个核心市场，财报历史回溯到 1980 年代
+- **公司披露**：覆盖 SEC EDGAR、日本 EDINET、港交所和 A 股报告，支持段落级语义检索
+- **业绩**：电话会 transcript、AI 结构化摘要和 estimate vs actuals；这类专业数据目前覆盖美股 + 日股
 - **行情**：股票、ETF、指数（含 Nikkei 225 / TOPIX）、外汇、加密货币、大宗商品
-- **分析师覆盖**：519 家机构、56.5 万条评级事件
-- **新闻 + 信号**：~6,900 个标的的持续更新流，跨资产（股票、宏观、地缘、商品、加密）
+- **美股专业数据**：分析师评级、持仓、管理层、8-K 事件和盘前盘后行情
+- **新闻 + 事件**：覆盖四个股票市场和跨资产内容，支持 storyline 聚合与观点归属
 - **AI 价值链另类数据**：24 个类目，跨能源 / 芯片 / 算力定价 / LLM token 经济 / 模型 benchmark / AI 公司财务 / app 使用 / 网站流量 / 专利 / 学术论文 / 政府合同 / 贸易流 / 金融 KOL（Twitter / Reddit / Substack / YouTube）
 
 完整数据字典：[`docs/tools.md`](./docs/tools.md)。
@@ -173,5 +173,3 @@ curl -X POST https://gateway.drillr.ai/api/v1/data/run_sql \
 ## License
 
 MIT —— 详见 [`LICENSE`](./LICENSE)。
-</content>
-</invoke>

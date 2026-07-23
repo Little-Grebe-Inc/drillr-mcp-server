@@ -30,7 +30,7 @@ X-API-Key: drl_xxxxxxxx_xxx...
 
 > Legacy `dgr_live_*` keys issued before 2026-04 are permanently compatible — no forced rotation. New keys use the `drl_` prefix.
 
-> **OAuth not supported on `/api/v1/*` REST endpoints.** OAuth 2.1 is available only on the v1.x MCP endpoint (`/mcp/private` — internal use); the v2.0 external MCP endpoint (`/mcp/data`) and all REST endpoints are Bearer API key only.
+> **OAuth is not supported on `/api/v1/*` REST endpoints.** The public MCP endpoint `/mcp/data` supports either a Bearer API key or MCP OAuth; REST requires an API key.
 
 ---
 
@@ -45,9 +45,11 @@ X-API-Key: drl_xxxxxxxx_xxx...
 | `GET` | `/api/v1/data/sec_report_list` | [`sec_report_list`](#get-apiv1datasec_report_list) |
 | `POST` | `/api/v1/data/sec_report_search` | [`sec_report_search`](#post-apiv1datasec_report_search) |
 | `POST` | `/api/v1/data/company_search` | [`company_search`](#post-apiv1datacompany_search) |
-| `POST` | `/api/v1/data/ticker_resolve` | [`ticker_resolve`](#post-apiv1dataticker_resolve) |
-| `GET` | `/api/v1/data/signal_list` | [`signal_list`](#get-apiv1datasignal_list) |
+| `POST` | `/api/v1/data/ticker_lookup` | [`ticker_lookup`](#post-apiv1dataticker_lookup) |
+| `POST` | `/api/v1/data/news_search` | [`news_search`](#post-apiv1datanews_search) |
 | `GET` | `/api/v1/data/fiscal_utility` | [`fiscal_utility`](#get-apiv1datafiscal_utility) |
+
+`ticker_resolve` was renamed to `ticker_lookup`; the old REST path remains a temporary deprecated alias. `signal_list` was replaced by `news_search`; the old MCP tool and REST path are removed with no alias. `news_search` uses POST and a new semantic-search request body rather than the old signal-feed query parameters.
 
 ---
 
@@ -59,9 +61,9 @@ Every `2xx` response from `/api/v1/*` REST endpoints wraps the payload in a unif
 {
   "data": { /* endpoint-specific payload — object or array */ },
   "_credits": {
-    "charged": 1,
+    "charged": "0.1",
     "method": "per_call",
-    "balance_after": 503
+    "balance_after": "503.0"
   }
 }
 ```
@@ -72,9 +74,9 @@ Every `2xx` response from `/api/v1/*` REST endpoints wraps the payload in a unif
 
 | Field | Type | Description |
 |---|---|---|
-| `charged` | integer | Credits deducted for this call. `0` for free tools. |
+| `charged` | string | Credits deducted, formatted with one decimal place. `"0.0"` for free tools. |
 | `method` | string | Billing model: `per_call` (fixed per-request) / `usage_based` (LLM-driven, scales with upstream cost) / `free` |
-| `balance_after` | integer | Credit balance after this call (`monthly_remaining + purchased_remaining`; may be negative when overdrafted) |
+| `balance_after` | string | Best-effort remaining balance, formatted with one decimal place. May be omitted; use the Developer Portal for the authoritative balance. |
 
 ---
 
@@ -189,7 +191,7 @@ Multi-step research with auto-citation. Drillr orchestrates the agent loop inter
     ],
     "duration_ms": 9420
   },
-  "_credits": { "charged": 12, "method": "usage_based", "balance_after": 488 }
+  "_credits": { "charged": "12.0", "method": "usage_based" }
 }
 ```
 
@@ -256,6 +258,8 @@ Read-only PostgreSQL SELECT against 90+ structured tables.
 - Date columns are TEXT — use string comparison (`period_end >= '2024-01'`), not `::date` cast or `INTERVAL` arithmetic
 - Structured tables require ticker filter; alt-data tables don't
 
+Core equity coverage is US, Japan, Hong Kong, and China A-shares. `financial_statements`, `company_snapshot`, and `price_volume_history` cover all four, using `AAPL`, `6758.T`, `00700.HK`, and `.SH` / `.SZ` A-share formats. Specialized tables may cover fewer markets; call `get_table_schema` before treating zero rows as a factual absence.
+
 **Response**:
 
 ```json
@@ -281,9 +285,9 @@ Read-only PostgreSQL SELECT against 90+ structured tables.
     "rowCount": 2
   },
   "_credits": {
-    "charged": 1,
+    "charged": "0.1",
     "method": "per_call",
-    "balance_after": 505
+    "balance_after": "505.0"
   }
 }
 ```
@@ -336,9 +340,9 @@ List alternative-data tables under given categories. Returns each table's name, 
     }
   ],
   "_credits": {
-    "charged": 0,
+    "charged": "0.0",
     "method": "free",
-    "balance_after": 509
+    "balance_after": "509.0"
   }
 }
 ```
@@ -353,13 +357,13 @@ curl -G https://gateway.drillr.ai/api/v1/data/list_tables \
 
 ---
 
-### `GET /api/v1/data/get_table_schema?table_name=:table_name`
+### `GET /api/v1/data/get_table_schema`
 
 **Tool**: `get_table_schema` · **Server**: drillr-data
 
 Look up column definitions for a specific table.
 
-**Path params**:
+**Query params**:
 
 | Name | Type | Description |
 |---|---|---|
@@ -390,9 +394,9 @@ Look up column definitions for a specific table.
     ]
   },
   "_credits": {
-    "charged": 0,
+    "charged": "0.0",
     "method": "free",
-    "balance_after": 507
+    "balance_after": "507.0"
   }
 }
 ```
@@ -410,14 +414,14 @@ curl https://gateway.drillr.ai/api/v1/data/get_table_schema?table_name=financial
 
 **Tool**: `sec_report_list` · **Server**: drillr-data
 
-List indexed SEC filings for a ticker, with a summary header.
+List indexed company filings for a ticker, with a summary header. Coverage includes US SEC EDGAR, Japan EDINET, HKEX, and China A-share filings.
 
 **Query params**:
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `ticker` | string | Yes | Stock ticker |
-| `filing_types` | CSV string | No | Omit for default (periodic reports + IPO/shelf + proxy). Pass empty for all. Pass `10-K,10-Q` to override |
+| `ticker` | string | Yes | `NVDA`, `6758.T`, `00700.HK`, `600519.SH`, etc. |
+| `filing_types` | CSV string | No | Omit for market-appropriate main reports, pass empty for all, or pass values returned by a prior unfiltered call |
 
 **Response**:
 
@@ -456,9 +460,9 @@ List indexed SEC filings for a ticker, with a summary header.
     }
   },
   "_credits": {
-    "charged": 1,
+    "charged": "0.1",
     "method": "per_call",
-    "balance_after": 507
+    "balance_after": "507.0"
   }
 }
 ```
@@ -477,7 +481,7 @@ curl -G https://gateway.drillr.ai/api/v1/data/sec_report_list \
 
 **Tool**: `sec_report_search` · **Server**: drillr-data
 
-Paragraph-level semantic search across SEC filings.
+Paragraph-level semantic search across company-filed reports in the US, Japan, Hong Kong, and China A-shares.
 
 **Request body**:
 
@@ -494,12 +498,12 @@ Paragraph-level semantic search across SEC filings.
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `ticker` | string | Yes | Stock ticker (foreign companies via ADR, e.g. `TSM`) |
+| `ticker` | string | Yes | US bare, Japan `.T`, Hong Kong `.HK`, or A-share `.SH` / `.SZ` ticker |
 | `query` | string | Yes | Search phrase |
 | `top_k` | integer | No | Default 10, max 30 |
 | `period_start` | string | No | yyyy-mm |
 | `period_end` | string | No | yyyy-mm |
-| `filing_types` | string[] | No | e.g. `["10-K", "10-Q"]`; default covers main reports |
+| `filing_types` | string[] | No | US form names, Japan EDINET numeric codes, or HK/A-share report names. Omit to search all types. |
 
 **Response**:
 
@@ -531,9 +535,9 @@ Paragraph-level semantic search across SEC filings.
     ]
   },
   "_credits": {
-    "charged": 1,
+    "charged": "0.1",
     "method": "per_call",
-    "balance_after": 503
+    "balance_after": "503.0"
   }
 }
 ```
@@ -549,57 +553,62 @@ Qualitative company discovery. **Natural-language input only** — the v1.x SQL 
 **Request body**:
 
 ```json
-{ "query": "AI inference chip startups" }
+{
+  "query": "Hong Kong and China EV battery suppliers",
+  "market": ["hk", "cn"]
+}
 ```
 
 | Field | Type | Required | Description |
 |---|---|---|---|
 | `query` | string | Yes | Natural-language description (e.g. "lithium-ion battery cell makers supplying European OEMs"). Do not pass SQL — use `run_sql` for that |
+| `market` | string or string[] | No | One value or a list from `"us"` / `"jp"` / `"hk"` / `"cn"`. Omit or pass `[]` for all four markets. |
 
 **Response**:
 
 ```json
 {
   "data": {
-    "query": "AI inference chip startups",
+    "query": "Hong Kong and China EV battery suppliers",
     "results": [
       {
-        "ticker": "GROQ",
-        "company_name": "Groq Inc",
-        "match_reason": "Develops LPU inference chips purpose-built for low-latency LLM serving; pure-play inference accelerator vendor."
+        "ticker": "01211.HK",
+        "company_name": "BYD Company Limited",
+        "market": "HK",
+        "match_reason": "Manufactures EVs and rechargeable batteries."
       }
     ]
   },
-  "_credits": { "charged": 5, "method": "usage_based", "balance_after": 498 }
+  "_credits": { "charged": "5.0", "method": "usage_based", "balance_after": "498.0" }
 }
 ```
 
 ---
 
-### `POST /api/v1/data/ticker_resolve`
+### `POST /api/v1/data/ticker_lookup`
 
-**Tool**: `ticker_resolve` · **Server**: drillr-data
+**Tool**: `ticker_lookup` · **Server**: drillr-data
 
 Resolve a company name, brand, or ticker substring to canonical ticker(s). Call this FIRST when the user mentions a company by name / brand / nickname before running any ticker-keyed tool.
 
 **Request body**:
 
 ```json
-{ "query": "苹果" }
+{ "query": "Tencent", "market": "hk" }
 ```
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `query` | string | Yes | Company name or ticker substring (case-insensitive, supports multilingual incl. Chinese). Matches historical names + tickers too. |
-| `market` | string | No | Optional market filter: `"us"` \| `"jp"`. Omit to search both markets. |
+| `query` | string | Yes | Company name, brand, or ticker substring. Matching is case-insensitive and includes ticker history. |
+| `market` | string | No | Optional market filter: `"us"` \| `"jp"` \| `"hk"` \| `"cn"`. Omit to search all markets. |
 
 **Example**:
 
 ```bash
-curl -X POST https://gateway.drillr.ai/api/v1/data/ticker_resolve \
+curl -X POST https://gateway.drillr.ai/api/v1/data/ticker_lookup \
   -H "Authorization: Bearer $DRILLR_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"query": "苹果"}'
+  -d '{"query":"Tencent","market":"hk"}'
 ```
 
 **Response**:
@@ -609,12 +618,8 @@ curl -X POST https://gateway.drillr.ai/api/v1/data/ticker_resolve \
   "data": {
     "results": [
       {
-        "company_name": "Apple Inc.",
-        "tickers": [{ "ticker": "AAPL", "valid_from": "unknown", "valid_to": "present" }]
-      },
-      {
-        "company_name": "APPLE INTERNATIONAL CO.,LTD.",
-        "tickers": [{ "ticker": "2788.T", "valid_from": "unknown", "valid_to": "present" }]
+        "company_name": "TENCENT",
+        "tickers": [{ "ticker": "00700.HK", "valid_from": "unknown", "valid_to": "present" }]
       }
     ]
   },
@@ -624,94 +629,45 @@ curl -X POST https://gateway.drillr.ai/api/v1/data/ticker_resolve \
 
 Returns up to 5 matches ranked by prefix-hit first, then name length.
 
+Ticker formats are US bare (`AAPL`), Japan `.T` (`6758.T`), Hong Kong five digits + `.HK` (`00700.HK`), and A-shares `.SH` / `.SZ` (`600519.SH`). Historical/raw ticker entries may occasionally appear without the current suffix. Localized-name recall varies; retry with the official English name or ticker substring when needed.
+
+`POST /api/v1/data/ticker_resolve` remains available as a temporary deprecated REST alias. There is no old-name alias on MCP.
+
 ---
 
-### `GET /api/v1/data/signal_list`
+### `POST /api/v1/data/news_search`
 
-**Tool**: `signal_list` · **Server**: drillr-data
+**Tool**: `news_search` · **Server**: drillr-data
 
-Recent news + market events feed.
+Semantic search over news, market events, and attributed claims, grouped into storylines.
 
-**Query params**:
+**Request body**:
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `tickers` | CSV string | No | Filter to signals whose `suggested_tickers` overlaps any of these |
-| `sector` | CSV string | No | Filter by sector overlap |
-| `since` | ISO 8601 string | No | Signals created at or after this timestamp |
-| `limit` | integer | No | Default 20, max 100 |
-| `offset` | integer | No | Pagination, default 0 |
+| `query` | string | Conditional | English semantic query |
+| `theme` | string | Conditional | Canonical-theme search; not valid by itself with `search_type="claims"` |
+| `ticker` | string or string[] | Conditional | Exact ticker(s); multiple tickers act as an OR filter |
+| `since` | ISO 8601 string | Conditional | Include events with `time_event >= since` |
+| `until` | ISO 8601 string | Conditional | Include events with `time_event < until` |
+| `search_type` | enum | No | `"all"` (default), `"events"`, or `"claims"` |
+| `order_by` | enum | No | `"relevance"` (default), `"event_time"`, or `"create_time"` |
+| `top_k` | integer | No | Story count; default 10, max 50 |
 
-**Response**:
+At least one of `query`, `theme`, `ticker`, `since`, or `until` is required. Coverage includes US, Japan, Hong Kong, and China A-shares, plus cross-asset macro, geopolitical, commodity, and crypto events.
 
-```json
-{
-  "data": {
-    "items": [
-      {
-        "id": 35847,
-        "headline": "$NVDA  - TRUMP: CHINA HASN’T BOUGHT NVIDIA H200 CHIPS  President Donald Trump said China has not pur...",
-        "summary": "$NVDA  - TRUMP: CHINA HASN’T BOUGHT NVIDIA H200 CHIPS\n\nPresident Donald Trump said China has not purchased Nvidia’s H200...",
-        "suggested_tickers": [
-          "NVDA",
-          "AAOI",
-          "ACLS",
-          "ACMR",
-          "ADI",
-          "..."
-        ],
-        "sector": [
-          "Information Technology"
-        ],
-        "score": 3.1,
-        "trigger_sources": [
-          {
-            "source_url": "https://twitter.com/DeItaone/status/2055255449507598362",
-            "source_name": "Twitter @DeItaone"
-          }
-        ],
-        "earliest_trigger_event_time": "2026-05-15T11:54:18.000Z",
-        "created_at": "2026-05-15T12:31:25.407Z",
-        "tags": {
-          "themes": [
-            "semiconductors",
-            "ai"
-          ],
-          "regions": [
-            "us",
-            "china"
-          ],
-          "version": 2,
-          "event_types": [
-            "general_news"
-          ],
-          "sectors_gics": [
-            "information_technology"
-          ],
-          "primary_class": "sector_event",
-          "affected_industries": [
-            "Semiconductors"
-          ]
-        }
-      }
-    ]
-  },
-  "_credits": {
-    "charged": 2,
-    "method": "per_call",
-    "balance_after": 498
-  }
-}
-```
+REST returns structured JSON with story-grouped events and a parallel claims collection. The MCP tool renders the same result as compact Markdown to fit host token limits.
 
 **Curl example**:
 
 ```bash
-curl -G https://gateway.drillr.ai/api/v1/data/signal_list \
+curl -X POST https://gateway.drillr.ai/api/v1/data/news_search \
   -H "Authorization: Bearer $DRILLR_API_KEY" \
-  --data-urlencode "tickers=NVDA,AMD" \
-  --data-urlencode "limit=5"
+  -H "Content-Type: application/json" \
+  -d '{"ticker":"00700.HK","search_type":"events","order_by":"event_time","top_k":3}'
 ```
+
+`signal_list` and `GET /api/v1/data/signal_list` are retired with no alias.
 
 ---
 
@@ -720,6 +676,8 @@ curl -G https://gateway.drillr.ai/api/v1/data/signal_list \
 **Tool**: `fiscal_utility` · **Server**: drillr-data
 
 Bidirectional fiscal year ↔ calendar month conversion.
+
+Coverage is primarily US, with sparse Japan / Hong Kong configuration and no verified China A-share configuration.
 
 **Query params**:
 
@@ -751,7 +709,7 @@ curl -G https://gateway.drillr.ai/api/v1/data/fiscal_utility \
     "period_end": "2025-10",
     "fiscal_year_end_month": 1
   },
-  "_credits": { "charged": 0, "method": "free", "balance_after": 507 }
+  "_credits": { "charged": "0.0", "method": "free", "balance_after": "507.0" }
 }
 ```
 

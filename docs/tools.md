@@ -16,8 +16,8 @@ URL: `https://gateway.drillr.ai/mcp/data` · 9 tools · 一把 `drl_*` key 全�
 | [`sec_report_search`](#sec_report_search) | `POST /api/v1/data/sec_report_search` |
 | [`sec_report_list`](#sec_report_list) | `GET /api/v1/data/sec_report_list` |
 | [`company_search`](#company_search) | `POST /api/v1/data/company_search` |
-| [`ticker_resolve`](#ticker_resolve) | `POST /api/v1/data/ticker_resolve` |
-| [`signal_list`](#signal_list) | `GET /api/v1/data/signal_list` |
+| [`ticker_lookup`](#ticker_lookup) | `POST /api/v1/data/ticker_lookup` |
+| [`news_search`](#news_search) | `POST /api/v1/data/news_search` |
 | [`list_tables`](#list_tables) | `GET /api/v1/data/list_tables` |
 | [`get_table_schema`](#get_table_schema) | `GET /api/v1/data/get_table_schema?table_name=:table` |
 | [`fiscal_utility`](#fiscal_utility) | `GET /api/v1/data/fiscal_utility` |
@@ -25,7 +25,7 @@ URL: `https://gateway.drillr.ai/mcp/data` · 9 tools · 一把 `drl_*` key 全�
 **Recommended workflow**:
 
 1. `fiscal_utility` / `get_table_schema` / `list_tables` — call freely to explore
-2. `signal_list` for recent news + market events
+2. `news_search` for news, market events, and attributed claims
 3. `run_sql` for structured data (financial / market / alt-data, 90+ tables)
 4. `sec_report_search` for narrative (10-K / 10-Q risk factors, segment, guidance)
 5. `company_search` for qualitative discovery (industry, supply chain, competitors)
@@ -45,7 +45,7 @@ Read-only PostgreSQL SELECT against 90+ structured tables. The workhorse of the 
 
 - SEC filing narrative content → use [`sec_report_search`](#sec_report_search) instead
 - Qualitative company discovery → use [`company_search`](#company_search) instead
-- Recent news + market events → use [`signal_list`](#signal_list) instead
+- News, market events, and attributed claims → use [`news_search`](#news_search) instead
 
 **Parameters**:
 
@@ -82,7 +82,7 @@ curl -X POST https://gateway.drillr.ai/api/v1/data/run_sql \
     ],
     "rowCount": 5
   },
-  "_credits": { "charged": 1, "method": "per_call", "balance_after": 505 }
+  "_credits": { "charged": "0.1", "method": "per_call", "balance_after": "505.0" }
 }
 ```
 
@@ -94,7 +94,10 @@ curl -X POST https://gateway.drillr.ai/api/v1/data/run_sql \
 |---|---|---|
 | US stock / ETF | bare 1-5 letters | `AAPL`, `MSFT`, `SPY`, `QQQ` |
 | US index | leading `^` | `^GSPC` (S&P 500), `^DJI`, `^IXIC`, `^NDX`, `^RUT`, `^VIX` |
-| Foreign listing | exchange suffix | `1557.T` (JP), `310960.KS` (KR) — Hong Kong / A-shares / Korea native coming soon |
+| Japan listing | `.T` suffix | `6758.T`, `7203.T` |
+| Hong Kong listing | five digits + `.HK` | `00700.HK`, `09988.HK` |
+| China A-share | `.SH` / `.SZ` suffix | `600519.SH`, `300750.SZ` |
+| Other foreign listing | exchange suffix | `310960.KS` (KR), `FTSEMIB.MI` (Italy) |
 | Foreign index | leading `^` | `^N225` (Nikkei 225), `^TPX` (TOPIX), `^FTSE`, `^GDAXI` |
 | Commodity | code + USD/USX | `CLUSD` (WTI futures), `GCUSD` (gold), `ZCUSX` (corn in cents) |
 | Forex | base+quote, no separator | `EURUSD`, `USDJPY`, `GBPUSD` |
@@ -106,11 +109,18 @@ curl -X POST https://gateway.drillr.ai/api/v1/data/run_sql \
 - WTI spot ≠ futures. `CLUSD` is NYMEX futures, not spot.
 - Tickers with `.` or `^` MUST be quoted in SQL: `WHERE ticker = '^NDX'`.
 
+**Equity coverage**:
+
+- `financial_statements`, `company_snapshot`, and `price_volume_history` cover US, Japan, Hong Kong, and China A-shares.
+- `price_volume_history` additionally carries other global listings, indices, FX, commodities, and crypto.
+- Specialized tables can be narrower: earnings calls/calendar are US + Japan; analyst, ownership, executive, 8-K event, and extended-hours datasets are US-only.
+- Call `get_table_schema` before interpreting zero rows as a factual absence.
+
 ---
 
 ### `sec_report_search`
 
-Paragraph-level semantic search across SEC filings.
+Paragraph-level semantic search across company-filed reports in the US, Japan, Hong Kong, and China A-shares.
 
 **When to use**:
 
@@ -127,19 +137,20 @@ Paragraph-level semantic search across SEC filings.
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `ticker` | string | Yes | Stock ticker, e.g. `NVDA`, `AAPL`. Foreign companies via ADR (e.g. `TSM` for TSMC) |
+| `ticker` | string | Yes | US bare (`NVDA`), Japan `.T` (`6758.T`), Hong Kong `.HK` (`00700.HK`), or A-share `.SH` / `.SZ` (`600519.SH`) |
 | `query` | string | Yes | Natural-language search phrase, e.g. "supply chain concentration", "share dilution" |
 | `top_k` | integer | No | Max paragraphs returned (default 10, max 30) |
 | `period_start` | string | No | YYYY-MM, filter filings from this period |
 | `period_end` | string | No | YYYY-MM, filter filings up to this period |
-| `filing_types` | string[] | No | e.g. `["10-K","10-Q"]`. Default covers main reports (10-K / 10-Q / 20-F / 6-K / S-1 / F-1) |
+| `filing_types` | string[] | No | Filing-type allowlist. Omit to search all types. Values differ by market; use `sec_report_list` to discover available values. |
 
 **Filing types covered**:
 
 - 10-K (US annual), 10-Q (US quarterly), 8-K (US current/material events)
 - 20-F (foreign annual), 6-K (foreign current)
 - S-1 (US IPO registration), F-1 (foreign IPO registration)
-
+- Japan EDINET numeric codes such as `120` (annual), `140` (quarterly), and `160` (semi-annual)
+- Hong Kong / A-share names such as `annual_report`, `quarterly_report`, and A-share quarter-specific values such as `q1_report`
 
 **Example call**:
 
@@ -175,7 +186,7 @@ curl -X POST https://gateway.drillr.ai/api/v1/data/sec_report_search \
 
 ### `sec_report_list`
 
-List indexed SEC filings for a ticker, with a summary header.
+List indexed company filings for a ticker, with a summary header.
 
 **When to use**:
 
@@ -190,8 +201,8 @@ List indexed SEC filings for a ticker, with a summary header.
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `ticker` | string | Yes | Stock ticker |
-| `filing_types` | string[] | No | Filter by type. Omit for default (periodic reports + IPO/shelf + proxy: 10-K, 10-Q, 20-F, S-1, F-1, S-3, F-3, DEF 14A and /A amendments; excludes 8-K/6-K). Pass `[]` for all indexed types. Pass explicit allowlist like `["8-K"]` to override |
+| `ticker` | string | Yes | `NVDA`, `6758.T`, `00700.HK`, `600519.SH`, etc. |
+| `filing_types` | string[] | No | Omit for the market-appropriate main reports; pass `[]` for all indexed types; or pass an explicit allowlist using values returned by a prior call |
 
 
 **Example call**:
@@ -240,7 +251,7 @@ Qualitative company discovery — industry classification, business model, suppl
 | Name | Type | Required | Description |
 |---|---|---|---|
 | `query` | string | Yes | Natural-language description of the companies you're looking for (e.g. "lithium-ion battery cell makers supplying European OEMs"). Do not pass SQL. |
-
+| `market` | string or string[] | No | One value or a list from `"us"` / `"jp"` / `"hk"` / `"cn"`. Omit or pass `[]` to search all four markets. List order does not set priority. |
 
 **Example call**:
 
@@ -248,11 +259,12 @@ Qualitative company discovery — industry classification, business model, suppl
 curl -X POST https://gateway.drillr.ai/api/v1/data/company_search \
   -H "Authorization: Bearer $DRILLR_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"query": "AI inference chip startups"}'
+  -d '{"query":"Hong Kong and China EV battery suppliers","market":["hk","cn"]}'
 ```
 
 **Coverage**:
 
+- US, Japan, Hong Kong, and China A-shares
 - Industry classification, product offerings, business model
 - Segment structure, competitive landscape, supply chain
 - Management background, customer profile
@@ -261,7 +273,7 @@ Returns a structured list of matching companies with context snippets.
 
 ---
 
-### `ticker_resolve`
+### `ticker_lookup`
 
 Resolve a company name, brand, or ticker substring to canonical ticker(s). Use this FIRST when the user mentions a company by name / brand / nickname before running any ticker-keyed tool.
 
@@ -280,83 +292,75 @@ Resolve a company name, brand, or ticker substring to canonical ticker(s). Use t
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `query` | string | Yes | Company name or ticker substring (case-insensitive, supports multilingual incl. Chinese). Matches historical names + tickers too. |
-| `market` | string | No | Optional market filter: `"us"` \| `"jp"`. Omit to search both markets. |
+| `query` | string | Yes | Company name, brand, or ticker substring. Matching is case-insensitive and includes ticker history. |
+| `market` | string | No | Optional filter: `"us"` \| `"jp"` \| `"hk"` \| `"cn"`. Omit to search all four markets. |
 
 
 **Example call**:
 
 ```bash
-curl -X POST https://gateway.drillr.ai/api/v1/data/ticker_resolve \
+curl -X POST https://gateway.drillr.ai/api/v1/data/ticker_lookup \
   -H "Authorization: Bearer $DRILLR_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"query": "苹果"}'
+  -d '{"query":"Tencent","market":"hk"}'
 ```
 
 Returns up to 5 matches ranked by prefix-hit first, then name length.
 
+Current ticker formats are US bare (`AAPL`), Japan `.T` (`6758.T`), Hong Kong five digits + `.HK` (`00700.HK`), and A-shares `.SH` / `.SZ` (`600519.SH`). Results include ticker history, so older/raw entries may occasionally appear without the current suffix. Localized-name recall varies by company; retry with the official English name or ticker substring if a local-language name misses.
+
+The old REST path `POST /api/v1/data/ticker_resolve` is a temporary deprecated alias. The MCP tool itself has no old-name alias.
+
 ---
 
-### `signal_list`
+### `news_search`
 
-Recent news + market events filtered by ticker / sector / time range. Each row is one signal: headline, summary, suggested_tickers, sector, created_at.
+Semantic search over news, market events, and attributed claims, grouped into storylines.
 
 **When to use**:
 
-- Recent news on specific tickers or sectors
-- Polling for new market-moving events since last check
-- Building news-driven alerting workflows
+- News or developments about a company, theme, or market
+- Market-moving events within a time window
+- Attributed statements such as analyst actions, company guidance, or central-bank remarks
 
 **When NOT to use**:
 
 - SEC filing narrative → use [`sec_report_search`](#sec_report_search)
-- Historical archive older than ~30 days → use [`run_sql`](#run_sql) on the underlying `content_signals` table
+- Company discovery by business description → use [`company_search`](#company_search)
 
 **Parameters**:
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `tickers` | string[] | No | Return signals whose `suggested_tickers` overlap any of these |
-| `sector` | string[] | No | Return signals whose sector overlaps any of these |
-| `since` | string (ISO 8601) | No | Return signals created at or after this timestamp |
-| `limit` | integer | No | Default 20, max 100 |
-| `offset` | integer | No | Pagination offset, default 0 |
+| `query` | string | Conditional | English semantic query |
+| `theme` | string | Conditional | Theme resolved to the nearest canonical theme; not valid by itself with `search_type="claims"` |
+| `ticker` | string or string[] | Conditional | One exact ticker, an array, or a comma-separated string. Multiple tickers act as an OR filter. |
+| `since` | ISO 8601 string | Conditional | Include events with `time_event >= since` |
+| `until` | ISO 8601 string | Conditional | Include events with `time_event < until` |
+| `search_type` | enum | No | `"all"` (default), `"events"`, or `"claims"` |
+| `order_by` | enum | No | `"relevance"` (default), `"event_time"`, or `"create_time"` |
+| `top_k` | integer | No | Story count; default 10, max 50 |
 
+At least one of `query`, `theme`, `ticker`, `since`, or `until` is required.
 
 **Coverage**:
 
-- ~6,900 tickers across US + ADRs of global companies
+- US, Japan, Hong Kong, and China A-shares
 - Cross-asset: equities, macro, geopolitics, commodities, crypto
-- Continuously updating, typically <1 hour lag from source
-- Newest first by `created_at`
+- Ticker formats: `AAPL`, `7203.T`, `00700.HK`, `600519.SH`
 
 **Example call**:
 
 ```bash
-curl -G https://gateway.drillr.ai/api/v1/data/signal_list \
+curl -X POST https://gateway.drillr.ai/api/v1/data/news_search \
   -H "Authorization: Bearer $DRILLR_API_KEY" \
-  --data-urlencode "tickers=NVDA,AMD" \
-  --data-urlencode "limit=5"
+  -H "Content-Type: application/json" \
+  -d '{"ticker":"00700.HK","search_type":"events","order_by":"event_time","top_k":3}'
 ```
 
-**Example response**:
+MCP renders a compact Markdown response: a numbered `Stories` section followed by flat `Events` and `Claims` tables. REST returns structured JSON containing story-grouped events and a parallel claims collection.
 
-```json
-{
-  "data": {
-    "items": [
-      {
-        "headline": "Greg Abel ends Berkshire's Buffett-era share selling streak",
-        "summary": "...",
-        "suggested_tickers": ["BRK.B", "OXY"],
-        "sector": ["Financial Services"],
-        "created_at": "2026-05-11T04:34:19Z"
-      }
-    ]
-  },
-  "_credits": { "charged": 2, "method": "per_call", "balance_after": 498 }
-}
-```
+`signal_list` and `GET /api/v1/data/signal_list` are retired with no alias.
 
 ---
 
@@ -458,6 +462,8 @@ Table: financial_statements
 
 Bidirectional fiscal year ↔ calendar month conversion. Different companies have different fiscal year starts (Apple ends in September, Nvidia ends in January) — use this before filtering on `period_end` columns.
 
+Coverage is primarily US, with sparse Japan / Hong Kong configuration and no verified China A-share configuration. Do not infer support from the broader four-market coverage of the core equity tables.
+
 **When to use**:
 
 - Converting "Nvidia Q3 FY2026" → calendar months (Aug 2025 - Oct 2025)
@@ -499,7 +505,7 @@ curl -G https://gateway.drillr.ai/api/v1/data/fiscal_utility \
 
 ## Data Coverage Reference
 
-For the full list of structured tables, categories, ticker conventions, and what's currently in coverage vs coming soon, see:
+For the full list of structured tables, categories, ticker conventions, and current coverage boundaries, see:
 
 - [Developer docs / data coverage](https://drillr.ai/developer/docs/coverage)
 - [REST API reference](./rest-api.md) — endpoint-by-endpoint, plus the `{ data, _credits }` envelope contract
