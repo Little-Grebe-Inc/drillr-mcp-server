@@ -15,45 +15,66 @@
 
 </div>
 
-一把 API key，9 个工具覆盖 Agent 研究：标准化财务数据、公司发现、新闻与事件语义检索、带段落引用的公司披露检索，以及另类数据。
+浏览器登录，不用复制 API key。9 个工具覆盖 Agent 研究：标准化财务数据、公司发现、新闻与事件语义检索、带段落引用的公司披露检索，以及另类数据。
 
 > ⭐ **如果 Drillr 帮到了你的 agent，给我们点个 Star——这是我们持续 in the open 迭代的信号。**
 
 ## 快速接入
 
 1. 在 [drillr.ai](https://drillr.ai) 注册
-2. 在 [drillr.ai/developer/keys](https://drillr.ai/developer/keys) 创建 `external` scope 的 API key(格式 `drl_xxxxxxxx_xxx...`,45 字符)—— 下面 config 里要粘贴它
-3. 加到你 host 的 mcp.json——一个 endpoint 就拿到下面所有工具。
+2. 把 `https://gateway.drillr.ai/mcp/data` 加到支持 OAuth 的 MCP 客户端
+3. 在浏览器登录并允许对应客户端。全程不会显示或要求复制密钥。
 
-### 方式 A：手动 mcp.json（任何 MCP host —— 推荐）
+### Claude Code
 
-#### Claude Code / Claude Agent SDK / Cursor / VS Code
+```bash
+claude mcp add --scope user --transport http drillr \
+  https://gateway.drillr.ai/mcp/data
+claude mcp login drillr
+```
+
+### Codex CLI
+
+```bash
+codex mcp add drillr --url https://gateway.drillr.ai/mcp/data
+```
+
+Codex 会在添加时自动打开浏览器登录；如果已经配置过，运行 `codex mcp login drillr`。
+
+### Claude Desktop / 支持 OAuth 的 Host
 
 ```jsonc
 {
   "mcpServers": {
     "drillr": {
       "type": "http",
-      "url": "https://gateway.drillr.ai/mcp/data",
-      "headers": { "Authorization": "Bearer <YOUR_DRILLR_API_KEY>" }
+      "url": "https://gateway.drillr.ai/mcp/data"
     }
   }
 }
 ```
 
-> ⚠️ **把 `<YOUR_DRILLR_API_KEY>` 替换成**(连同尖括号一起)你在步骤 2 拿到的 `drl_*` key。熟悉环境变量的用户也可以保留 `${DRILLR_API_KEY}` 写法,前提是先在启动 host 的 shell 里 `export DRILLR_API_KEY=drl_...`(Claude Code / Cursor / VS Code 都支持自动展开)。
+保存后重启 Host，按提示在浏览器允许 Drillr。
 
-Cursor 用户：把上面这段加到 `~/.cursor/mcp.json`。VS Code（GitHub Copilot Chat）用户：在 Command Palette 跑 `MCP: Add Server` 粘贴即可。或用一键安装：
+### API Key 兜底
+
+仅 REST 或客户端确实不支持浏览器 OAuth 时使用。在 [drillr.ai/developer/keys](https://drillr.ai/developer/keys) 创建 `external` key，放进密钥管理器，再在 server 配置中加入：
+
+```jsonc
+"headers": { "Authorization": "Bearer <YOUR_DRILLR_API_KEY>" }
+```
+
+Cursor 和 VS Code 用户可使用各自的 MCP 配置界面。如果当前版本只支持静态 Bearer token，可使用下面的 Key 模式一键安装：
 
 [![Install in Cursor](https://img.shields.io/badge/Install_in-Cursor-171717?style=for-the-badge&logo=cursor&logoColor=white)](https://cursor.com/en/install-mcp?name=drillr&config=eyJ1cmwiOiJodHRwczovL2dhdGV3YXkuZHJpbGxyLmFpL21jcC9kYXRhIiwiaGVhZGVycyI6eyJBdXRob3JpemF0aW9uIjoiQmVhcmVyICR7RFJJTExSX0FQSV9LRVl9In19) [![Install in VS Code](https://img.shields.io/badge/Install_in-VS_Code-0078D4?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=drillr&config=%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A//gateway.drillr.ai/mcp/data%22%2C%22headers%22%3A%7B%22Authorization%22%3A%22Bearer%20%24%7BDRILLR_API_KEY%7D%22%7D%7D)
 
-安装后把生成 config 里的 `${DRILLR_API_KEY}` 替换成你真实的 `drl_*` key 即可。
+通过 Key 模式安装后，把生成 config 里的 `${DRILLR_API_KEY}` 替换成真实的 `drl_*` key。
 
-#### 扣子（字节跳动） / 千帆（百度智能云） / 火山方舟（字节跳动）
+#### 扣子（字节跳动） / 千帆（百度智能云） / 火山方舟（字节跳动）兜底
 
 按各平台 MCP server 添加规范填入:transport `http`、URL `https://gateway.drillr.ai/mcp/data`、Authorization header 写 `Bearer <YOUR_DRILLR_API_KEY>`(把尖括号占位换成你真实的 `drl_*` key)。
 
-#### Hermes Agent
+#### Hermes Agent 兜底
 
 ```yaml
 mcp_servers:
@@ -64,19 +85,19 @@ mcp_servers:
 
 #### 其他 host
 
-任何支持 MCP 的 host（OpenClaw / ChatGPT MCP 等）都能用——同一套 Streamable HTTP transport。推荐使用 Bearer API key；支持 MCP OAuth 的客户端也可以删掉 `headers` 配置，通过浏览器完成登录。
+任何支持 MCP 的 Host 都使用同一个 Streamable HTTP Endpoint。支持 OAuth 时删掉 `headers`，走浏览器登录；不支持时再用上面的 API Key 兜底。同一个 server entry 不要同时配置 OAuth 和静态 Bearer header。
 
-### 方式 B：Smithery 一行装
+### Smithery 兜底
 
 ```bash
 npx -y @smithery/cli install drillr/drillr --client claude
 ```
 
-Smithery 首次安装时会提示你输入 `drl_*` API key，自动写进 client 的 mcp.json。
+Smithery 目前仍会在首次安装时提示输入 `drl_*` API key，并写入客户端配置。它是兼容兜底，不是支持 OAuth 客户端的默认方案。
 
 Listing：https://smithery.ai/servers/drillr/drillr
 
-### 方式 C：Claude Code 插件
+### Claude Code 插件兜底
 
 本仓库自带 Claude Code single-plugin marketplace。在 Claude Code 里跑：
 
@@ -85,7 +106,7 @@ Listing：https://smithery.ai/servers/drillr/drillr
 /plugin install drillr
 ```
 
-之后在环境变量里设 `DRILLR_API_KEY`（或把它粘进生成的 config），即可使用。
+这个插件目前使用 API Key 兜底。请在环境变量里设置 `DRILLR_API_KEY`，不要把 key 发进聊天或提交到仓库。
 
 ## Hello World
 
