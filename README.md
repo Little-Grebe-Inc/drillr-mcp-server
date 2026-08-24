@@ -15,41 +15,62 @@ The financial MCP for AI agents. Scan markets. Build conviction. Track every sig
 
 </div>
 
-One API key. Nine tools for agent research: standardized financial data, company discovery, semantic news and event search, paragraph-cited company filings, and alt-data.
+Browser sign-in. No API key to copy. Nine tools for agent research: standardized financial data, company discovery, semantic news and event search, paragraph-cited company filings, and alt-data.
 
 > ⭐ **If drillr helps your agent, star us — that's how we know to keep building this in the open.**
 
 ## Quick Start
 
 1. Sign up at [drillr.ai](https://drillr.ai)
-2. Get an `external`-scope API key (format `drl_xxxxxxxx_xxx...`, 45 chars) at [drillr.ai/developer/keys](https://drillr.ai/developer/keys) — you'll paste this into the config below
-3. Drop into your host's mcp.json — one endpoint exposes all the tools below.
+2. Add `https://gateway.drillr.ai/mcp/data` to an OAuth-capable MCP client
+3. Sign in and approve the named client in your browser. No secret is displayed or copied.
 
-### Option A: Manual mcp.json (any MCP host — recommended)
+### Claude Code
 
-#### Claude Code / Claude Agent SDK / Cursor / VS Code
+```bash
+claude mcp add --scope user --transport http drillr \
+  https://gateway.drillr.ai/mcp/data
+claude mcp login drillr
+```
+
+### Codex CLI
+
+```bash
+codex mcp add drillr --url https://gateway.drillr.ai/mcp/data
+```
+
+Codex starts browser sign-in during setup. For an existing entry, run `codex mcp login drillr`.
+
+### Claude Desktop / OAuth-capable hosts
 
 ```jsonc
 {
   "mcpServers": {
     "drillr": {
       "type": "http",
-      "url": "https://gateway.drillr.ai/mcp/data",
-      "headers": { "Authorization": "Bearer <YOUR_DRILLR_API_KEY>" }
+      "url": "https://gateway.drillr.ai/mcp/data"
     }
   }
 }
 ```
 
-> ⚠️ **Replace `<YOUR_DRILLR_API_KEY>`** (including the angle brackets) with the `drl_*` key you got in step 2. Power users on Claude Code / Cursor / VS Code can use `${DRILLR_API_KEY}` instead and `export DRILLR_API_KEY=drl_...` in the shell launching the host.
+Restart the host after saving, then approve Drillr in the browser when prompted.
 
-For Cursor, paste the block into `~/.cursor/mcp.json`. For VS Code (GitHub Copilot Chat), run `MCP: Add Server` from the Command Palette and paste the block. Or use one-click install:
+### API-key fallback
+
+Use this only for REST or an MCP host that does not support browser OAuth. Create an `external` key at [drillr.ai/developer/keys](https://drillr.ai/developer/keys), store it as a secret, and add:
+
+```jsonc
+"headers": { "Authorization": "Bearer <YOUR_DRILLR_API_KEY>" }
+```
+
+Cursor and VS Code users can use their native MCP setup UI. If the installed version requires a static bearer token, use these key-based installers:
 
 [![Install in Cursor](https://img.shields.io/badge/Install_in-Cursor-171717?style=for-the-badge&logo=cursor&logoColor=white)](https://cursor.com/en/install-mcp?name=drillr&config=eyJ1cmwiOiJodHRwczovL2dhdGV3YXkuZHJpbGxyLmFpL21jcC9kYXRhIiwiaGVhZGVycyI6eyJBdXRob3JpemF0aW9uIjoiQmVhcmVyICR7RFJJTExSX0FQSV9LRVl9In19) [![Install in VS Code](https://img.shields.io/badge/Install_in-VS_Code-0078D4?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=drillr&config=%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A//gateway.drillr.ai/mcp/data%22%2C%22headers%22%3A%7B%22Authorization%22%3A%22Bearer%20%24%7BDRILLR_API_KEY%7D%22%7D%7D)
 
-After install, replace `${DRILLR_API_KEY}` in the generated config with your real `drl_*` key.
+After a key-based install, replace `${DRILLR_API_KEY}` in the generated config with your real `drl_*` key.
 
-#### Hermes Agent
+#### Hermes Agent fallback
 
 ```yaml
 mcp_servers:
@@ -60,19 +81,19 @@ mcp_servers:
 
 #### Other hosts
 
-Any MCP-compatible host (OpenClaw, ChatGPT MCP, etc.) — same Streamable HTTP transport. A Bearer API key is the recommended setup. Clients with MCP OAuth support can instead omit the `headers` block and complete the browser sign-in flow.
+Any MCP-compatible host uses the same Streamable HTTP endpoint. Omit `headers` and use browser OAuth whenever the host supports it; otherwise use the API-key fallback above. Never configure OAuth and a static bearer header on the same server entry.
 
-### Option B: Smithery one-line
+### Smithery fallback
 
 ```bash
 npx -y @smithery/cli install drillr/drillr --client claude
 ```
 
-Smithery prompts for your `drl_*` API key on first install and writes it into your client's mcp.json automatically.
+Smithery currently prompts for your `drl_*` API key on first install and writes it into your client's mcp.json automatically. This is a fallback path, not the default for OAuth-capable clients.
 
 Listing: https://smithery.ai/servers/drillr/drillr
 
-### Option C: Claude Code plugin
+### Claude Code plugin fallback
 
 This repo doubles as its own single-plugin marketplace. From Claude Code:
 
@@ -81,7 +102,7 @@ This repo doubles as its own single-plugin marketplace. From Claude Code:
 /plugin install drillr
 ```
 
-Then set `DRILLR_API_KEY` in your environment (or paste it into the generated config) and you're done.
+This plugin currently uses the API-key fallback. Set `DRILLR_API_KEY` in your environment; do not paste the key into chat or commit it.
 
 ## Hello World
 
