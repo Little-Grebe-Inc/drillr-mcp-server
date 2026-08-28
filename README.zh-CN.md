@@ -56,6 +56,12 @@ Codex 会在添加时自动打开浏览器登录；如果已经配置过，运�
 
 保存后重启 Host，按提示在浏览器允许 Drillr。
 
+### Cursor / VS Code
+
+点一下即可写入配置，编辑器随后会引导你在浏览器登录。
+
+[![Install in Cursor](https://img.shields.io/badge/Install_in-Cursor-171717?style=for-the-badge&logo=cursor&logoColor=white)](https://cursor.com/en/install-mcp?name=drillr&config=eyJ1cmwiOiJodHRwczovL2dhdGV3YXkuZHJpbGxyLmFpL21jcC9kYXRhIn0=) [![Install in VS Code](https://img.shields.io/badge/Install_in-VS_Code-0078D4?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=drillr&config=%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fgateway.drillr.ai%2Fmcp%2Fdata%22%7D)
+
 ### API Key 兜底
 
 仅 REST 或客户端确实不支持浏览器 OAuth 时使用。在 [drillr.ai/developer/keys](https://drillr.ai/developer/keys) 创建 `external` key，放进密钥管理器，再在 server 配置中加入：
@@ -63,12 +69,6 @@ Codex 会在添加时自动打开浏览器登录；如果已经配置过，运�
 ```jsonc
 "headers": { "Authorization": "Bearer <YOUR_DRILLR_API_KEY>" }
 ```
-
-Cursor 和 VS Code 用户可使用各自的 MCP 配置界面。如果当前版本只支持静态 Bearer token，可使用下面的 Key 模式一键安装：
-
-[![Install in Cursor](https://img.shields.io/badge/Install_in-Cursor-171717?style=for-the-badge&logo=cursor&logoColor=white)](https://cursor.com/en/install-mcp?name=drillr&config=eyJ1cmwiOiJodHRwczovL2dhdGV3YXkuZHJpbGxyLmFpL21jcC9kYXRhIiwiaGVhZGVycyI6eyJBdXRob3JpemF0aW9uIjoiQmVhcmVyICR7RFJJTExSX0FQSV9LRVl9In19) [![Install in VS Code](https://img.shields.io/badge/Install_in-VS_Code-0078D4?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=drillr&config=%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A//gateway.drillr.ai/mcp/data%22%2C%22headers%22%3A%7B%22Authorization%22%3A%22Bearer%20%24%7BDRILLR_API_KEY%7D%22%7D%7D)
-
-通过 Key 模式安装后，把生成 config 里的 `${DRILLR_API_KEY}` 替换成真实的 `drl_*` key。
 
 #### 扣子（字节跳动） / 千帆（百度智能云） / 火山方舟（字节跳动）兜底
 
@@ -106,7 +106,7 @@ Listing：https://smithery.ai/servers/drillr/drillr
 /plugin install drillr
 ```
 
-这个插件目前使用 API Key 兜底。请在环境变量里设置 `DRILLR_API_KEY`，不要把 key 发进聊天或提交到仓库。
+插件安装时不需要 key。重启 Claude Code 后运行 `/mcp`，选中 `drillr`，再选 `Authenticate` 完成浏览器授权。
 
 ## Hello World
 

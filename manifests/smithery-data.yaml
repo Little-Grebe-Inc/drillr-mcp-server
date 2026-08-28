@@ -15,8 +15,10 @@ tags: [finance, sec-filings, alternative-data, sql, llm-native]
 config:
   headers:
     Authorization:
-      description: Bearer drl_*. Get one at drillr.ai/developer/keys?ref=mp_smithery
-      required: true
+      description: >-
+        Optional. Leave empty to sign in through the browser (OAuth). Only needed
+        for hosts without OAuth support — get a key at drillr.ai/developer/keys?ref=mp_smithery
+      required: false
 icon: https://raw.githubusercontent.com/Little-Grebe-Inc/drillr-mcp-server/main/docs/images/icon.png
 screenshots:
   - https://raw.githubusercontent.com/Little-Grebe-Inc/drillr-mcp-server/main/docs/images/hero.gif

@@ -1,7 +1,7 @@
 {
   "name": "drillr",
-  "description": "Drillr financial MCP for AI agents — four-market financial data, company-filing and semantic news search, plus 24 alt-data categories. One HTTP MCP server exposing 9 tools.",
-  "version": "1.0.0",
+  "description": "Drillr financial MCP for AI agents \u2014 four-market financial data, company-filing and semantic news search, plus 24 alt-data categories. One HTTP MCP server exposing 9 tools.",
+  "version": "1.1.0",
   "author": {
     "name": "Little Grebe Inc."
   },
@@ -19,10 +19,7 @@
   "mcpServers": {
     "drillr": {
       "type": "http",
-      "url": "https://gateway.drillr.ai/mcp/data",
-      "headers": {
-        "Authorization": "Bearer ${DRILLR_API_KEY}"
-      }
+      "url": "https://gateway.drillr.ai/mcp/data"
     }
   }
 }

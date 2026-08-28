@@ -56,6 +56,12 @@ Codex starts browser sign-in during setup. For an existing entry, run `codex mcp
 
 Restart the host after saving, then approve Drillr in the browser when prompted.
 
+### Cursor / VS Code
+
+One click writes the server entry; your editor then signs you in through the browser.
+
+[![Install in Cursor](https://img.shields.io/badge/Install_in-Cursor-171717?style=for-the-badge&logo=cursor&logoColor=white)](https://cursor.com/en/install-mcp?name=drillr&config=eyJ1cmwiOiJodHRwczovL2dhdGV3YXkuZHJpbGxyLmFpL21jcC9kYXRhIn0=) [![Install in VS Code](https://img.shields.io/badge/Install_in-VS_Code-0078D4?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=drillr&config=%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fgateway.drillr.ai%2Fmcp%2Fdata%22%7D)
+
 ### API-key fallback
 
 Use this only for REST or an MCP host that does not support browser OAuth. Create an `external` key at [drillr.ai/developer/keys](https://drillr.ai/developer/keys), store it as a secret, and add:
@@ -63,12 +69,6 @@ Use this only for REST or an MCP host that does not support browser OAuth. Creat
 ```jsonc
 "headers": { "Authorization": "Bearer <YOUR_DRILLR_API_KEY>" }
 ```
-
-Cursor and VS Code users can use their native MCP setup UI. If the installed version requires a static bearer token, use these key-based installers:
-
-[![Install in Cursor](https://img.shields.io/badge/Install_in-Cursor-171717?style=for-the-badge&logo=cursor&logoColor=white)](https://cursor.com/en/install-mcp?name=drillr&config=eyJ1cmwiOiJodHRwczovL2dhdGV3YXkuZHJpbGxyLmFpL21jcC9kYXRhIiwiaGVhZGVycyI6eyJBdXRob3JpemF0aW9uIjoiQmVhcmVyICR7RFJJTExSX0FQSV9LRVl9In19) [![Install in VS Code](https://img.shields.io/badge/Install_in-VS_Code-0078D4?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=drillr&config=%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A//gateway.drillr.ai/mcp/data%22%2C%22headers%22%3A%7B%22Authorization%22%3A%22Bearer%20%24%7BDRILLR_API_KEY%7D%22%7D%7D)
-
-After a key-based install, replace `${DRILLR_API_KEY}` in the generated config with your real `drl_*` key.
 
 #### Hermes Agent fallback
 
@@ -89,7 +89,7 @@ Any MCP-compatible host uses the same Streamable HTTP endpoint. Omit `headers` a
 npx -y @smithery/cli install drillr/drillr --client claude
 ```
 
-Smithery currently prompts for your `drl_*` API key on first install and writes it into your client's mcp.json automatically. This is a fallback path, not the default for OAuth-capable clients.
+Smithery offers the API key as an optional field. Leave it empty on an OAuth-capable client and sign in through the browser instead.
 
 Listing: https://smithery.ai/servers/drillr/drillr
 
@@ -102,7 +102,7 @@ This repo doubles as its own single-plugin marketplace. From Claude Code:
 /plugin install drillr
 ```
 
-This plugin currently uses the API-key fallback. Set `DRILLR_API_KEY` in your environment; do not paste the key into chat or commit it.
+The plugin installs the server without a key. Restart Claude Code, run `/mcp`, pick `drillr`, and choose `Authenticate`.
 
 ## Hello World
 
