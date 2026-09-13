@@ -93,6 +93,16 @@ Smithery offers the API key as an optional field. Leave it empty on an OAuth-cap
 
 Listing: https://smithery.ai/servers/drillr/drillr
 
+### Agent skill
+
+The companion skill teaches an agent how to onboard a user and use these nine tools well:
+
+```bash
+npx skills add Little-Grebe-Inc/drillr-skill
+```
+
+Source and other install paths: https://github.com/Little-Grebe-Inc/drillr-skill
+
 ### Claude Code plugin fallback
 
 This repo doubles as its own single-plugin marketplace. From Claude Code:
