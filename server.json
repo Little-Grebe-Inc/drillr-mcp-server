@@ -1,10 +1,10 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "ai.drillr/drillr",
-  "title": "Drillr \u2014 The financial MCP for AI agents",
-  "description": "The financial MCP for AI agents - four-market financial tables, company filings, semantic news search, and alt-data.",
-  "version": "2.2.0",
-  "websiteUrl": "https://drillr.ai/?ref=mp_registry",
+  "title": "Drillr — The financial MCP for AI agents",
+  "description": "Financial data and research MCP for AI agents: filings with full-text and fact search, statements, earnings, ownership, corporate events, executives, analyst data, company discovery and research signals for US, China and Japan equities. Every figure traced to its filing. Browser sign-in.",
+  "version": "2.3.0",
+  "websiteUrl": "https://drillr.ai/docs/mcp?ref=mp_registry",
   "repository": {
     "url": "https://github.com/Little-Grebe-Inc/drillr-mcp-server",
     "source": "github"

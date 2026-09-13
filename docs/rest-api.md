@@ -1,4 +1,6 @@
-# REST API Reference
+# REST API Reference (v1 tool mirrors)
+
+> **The primary REST surface is the Public Data API v2** — 29 typed endpoints, docs at <https://drillr.ai/docs/api>, OpenAPI at <https://gateway.drillr.ai/api/v2/openapi.json>. This page documents the older `/api/v1/data/*` mirrors of the MCP tools; tool names here predate the 2026-09 renames (`sec_report_*` → `filing_*`).
 
 > MCP 与 REST 等价：用同一份 `drl_*` API key、同样的数据。本文档对应 REST 路径。CLI(`drillr` 命令行)即将推出。
 >

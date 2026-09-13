@@ -1,7 +1,7 @@
 {
   "name": "drillr",
-  "version": "2.2.0",
-  "description": "Drillr — financial data MCP for agents: four-market fundamentals via SQL, paragraph-cited filings search, semantic news search, alt-data.",
+  "version": "2.3.0",
+  "description": "drillr — financial data and research MCP for AI agents: filings with fact search, statements, earnings, ownership, events, executives, analyst data, company discovery and research signals for US, China and Japan.",
   "mcpServers": {
     "drillr": {
       "httpUrl": "https://gateway.drillr.ai/mcp/data"

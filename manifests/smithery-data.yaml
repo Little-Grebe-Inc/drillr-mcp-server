@@ -1,23 +1,24 @@
 name: drillr-data
-displayName: Drillr Data — financial data backend
+displayName: drillr — financial data and research MCP
 description: |
-  Drillr's 9-tool data backend for AI agents. SQL over 90+ standardized
-  financial tables (statements, ratios, earnings, insider, ownership,
-  prices), semantic news search, company-filing search, and 24 alt-data
-  categories. Core equity coverage spans the US, Japan, Hong Kong, and
-  China A-shares, with fundamentals back to the 1980s.
+  drillr's financial data and research MCP for AI agents. Ten tools: resolve
+  names to tickers, discover companies by description, list and search a
+  company's filings (structured as-reported facts plus the filed text), run
+  read-only SQL over the financial, price, earnings, ownership, analyst,
+  event and executive tables, and pull research signals from earnings calls
+  and news. US, China and Japan; every figure traced to its filing.
 homepage: https://drillr.ai
 repository: https://github.com/Little-Grebe-Inc/drillr-mcp-server
 license: MIT
 runtime: http
 endpoint: https://gateway.drillr.ai/mcp/data
-tags: [finance, sec-filings, alternative-data, sql, llm-native]
+tags: [finance, sec-filings, financial-data, equity-research, sql]
 config:
   headers:
     Authorization:
       description: >-
         Optional. Leave empty to sign in through the browser (OAuth). Only needed
-        for hosts without OAuth support — get a key at drillr.ai/developer/keys?ref=mp_smithery
+        for hosts without OAuth support — get a key at drillr.ai/account/api-keys?ref=mp_smithery
       required: false
 icon: https://raw.githubusercontent.com/Little-Grebe-Inc/drillr-mcp-server/main/docs/images/icon.png
 screenshots:
