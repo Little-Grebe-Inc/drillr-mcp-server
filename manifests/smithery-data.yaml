@@ -7,7 +7,7 @@ description: |
   read-only SQL over the financial, price, earnings, ownership, analyst,
   event and executive tables, and pull research signals from earnings calls
   and news. US, China and Japan; every figure traced to its filing.
-homepage: https://drillr.ai
+homepage: https://drillr.ai/docs/mcp
 repository: https://github.com/Little-Grebe-Inc/drillr-mcp-server
 license: MIT
 runtime: http

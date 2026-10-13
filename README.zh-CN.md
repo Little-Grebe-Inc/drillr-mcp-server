@@ -19,94 +19,41 @@
 
 > ⭐ **如果 Drillr 帮到了你的 agent，给我们点个 Star——这是我们持续 in the open 迭代的信号。**
 
-## 快速接入
+## 安装 drillr MCP
 
-1. 在 [drillr.ai](https://drillr.ai) 注册
-2. 把 `https://gateway.drillr.ai/mcp/data` 加到支持 OAuth 的 MCP 客户端
-3. 在浏览器登录并允许对应客户端。全程不会显示或要求复制密钥。
+安装或连接 drillr MCP，请阅读[官方安装指南](https://drillr.ai/developer/mcp-install.md)。
+各客户端的安装、浏览器 OAuth 登录和连接验证步骤统一在这份指南里维护。
 
-### Claude Code
+把下面这段提示粘贴到你要使用 drillr 的应用里：
+
+```text
+Please connect drillr MCP in this app using this installation guide: https://drillr.ai/developer/mcp-install.md. Walk me through sign-in and verify the connection.
+```
+
+公开服务器名称为 `drillr-data`，地址为 `https://gateway.drillr.ai/mcp/data`，使用 Streamable HTTP。
+默认通过浏览器 OAuth 登录。客户端的特殊要求及不支持 OAuth 时的 API key 备选方案，请查阅安装指南。
+
+手动设置和工具参考见 [drillr.ai/docs/mcp](https://drillr.ai/docs/mcp)。
+
+### Agent Skill
+
+[drillr skill](https://github.com/Little-Grebe-Inc/drillr-skill) 提供 MCP 和 REST 的研究工作流。连接 MCP 不要求先安装 Skill：
 
 ```bash
-claude mcp add --scope user --transport http drillr \
-  https://gateway.drillr.ai/mcp/data
-claude mcp login drillr
+npx skills add Little-Grebe-Inc/drillr-skill
 ```
 
-### Codex CLI
+### 分发入口
 
-```bash
-codex mcp add drillr --url https://gateway.drillr.ai/mcp/data
-```
+- [Smithery 页面](https://smithery.ai/servers/drillr/drillr)
+- 本仓库也提供 Claude Code 插件市场：
 
-Codex 会在添加时自动打开浏览器登录；如果已经配置过，运行 `codex mcp login drillr`。
-
-### Claude Desktop / 支持 OAuth 的 Host
-
-```jsonc
-{
-  "mcpServers": {
-    "drillr": {
-      "type": "http",
-      "url": "https://gateway.drillr.ai/mcp/data"
-    }
-  }
-}
-```
-
-保存后重启 Host，按提示在浏览器允许 Drillr。
-
-### Cursor / VS Code
-
-点一下即可写入配置，编辑器随后会引导你在浏览器登录。
-
-[![Install in Cursor](https://img.shields.io/badge/Install_in-Cursor-171717?style=for-the-badge&logo=cursor&logoColor=white)](https://cursor.com/en/install-mcp?name=drillr&config=eyJ1cmwiOiJodHRwczovL2dhdGV3YXkuZHJpbGxyLmFpL21jcC9kYXRhIn0=) [![Install in VS Code](https://img.shields.io/badge/Install_in-VS_Code-0078D4?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=drillr&config=%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fgateway.drillr.ai%2Fmcp%2Fdata%22%7D)
-
-### API Key 兜底
-
-仅 REST 或客户端确实不支持浏览器 OAuth 时使用。在 [drillr.ai/developer/keys](https://drillr.ai/developer/keys) 创建 `external` key，放进密钥管理器，再在 server 配置中加入：
-
-```jsonc
-"headers": { "Authorization": "Bearer <YOUR_DRILLR_API_KEY>" }
-```
-
-#### 扣子（字节跳动） / 千帆（百度智能云） / 火山方舟（字节跳动）兜底
-
-按各平台 MCP server 添加规范填入:transport `http`、URL `https://gateway.drillr.ai/mcp/data`、Authorization header 写 `Bearer <YOUR_DRILLR_API_KEY>`(把尖括号占位换成你真实的 `drl_*` key)。
-
-#### Hermes Agent 兜底
-
-```yaml
-mcp_servers:
-  drillr:
-    url: 'https://gateway.drillr.ai/mcp/data'
-    headers: { Authorization: 'Bearer <YOUR_DRILLR_API_KEY>' }
-```
-
-#### 其他 host
-
-任何支持 MCP 的 Host 都使用同一个 Streamable HTTP Endpoint。支持 OAuth 时删掉 `headers`，走浏览器登录；不支持时再用上面的 API Key 兜底。同一个 server entry 不要同时配置 OAuth 和静态 Bearer header。
-
-### Smithery 兜底
-
-```bash
-npx -y @smithery/cli install drillr/drillr --client claude
-```
-
-Smithery 目前仍会在首次安装时提示输入 `drl_*` API key，并写入客户端配置。它是兼容兜底，不是支持 OAuth 客户端的默认方案。
-
-Listing：https://smithery.ai/servers/drillr/drillr
-
-### Claude Code 插件兜底
-
-本仓库自带 Claude Code single-plugin marketplace。在 Claude Code 里跑：
-
-```
+```text
 /plugin marketplace add Little-Grebe-Inc/drillr-mcp-server
 /plugin install drillr
 ```
 
-插件安装时不需要 key。重启 Claude Code 后运行 `/mcp`，选中 `drillr`，再选 `Authenticate` 完成浏览器授权。
+安装插件后，按官方指南完成当前客户端的登录和连接验证。
 
 ## Hello World
 
