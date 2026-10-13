@@ -19,80 +19,41 @@ Browser sign-in, no API key to copy. One hosted Streamable HTTP endpoint, ten to
 
 > ⭐ **If drillr helps your agent, star us — that's how we know to keep building this in the open.**
 
-## Quick Start
+## Install drillr MCP
 
-1. Sign up at [drillr.ai](https://drillr.ai) (80 free credits, no card)
-2. Add `https://gateway.drillr.ai/mcp/data` to an OAuth-capable MCP client as `drillr-data`
-3. Approve **drillr Data** in the browser. Restart the client — MCP tools load at startup.
+To install or connect drillr MCP, read the [official installation guide](https://drillr.ai/developer/mcp-install.md).
+It is the maintained source for client-specific setup, browser OAuth sign-in, and connection checks.
 
-Per-client instructions, kept current on the docs site: <https://drillr.ai/developer/mcp-install.md>. Or paste this into any coding agent with a shell:
+Paste this into the app where you want to use drillr:
 
 ```text
-Please install the drillr MCP server for me and walk me through the sign-in: server drillr-data, url https://gateway.drillr.ai/mcp/data, auth browser OAuth. Use my client's own MCP command to add it. Per-client details: https://drillr.ai/developer/mcp-install.md
+Please connect drillr MCP in this app using this installation guide: https://drillr.ai/developer/mcp-install.md. Walk me through sign-in and verify the connection.
 ```
 
-### Claude Code
+The public server is `drillr-data` at `https://gateway.drillr.ai/mcp/data` (Streamable HTTP).
+Browser OAuth is the default. The guide covers client-specific requirements and the API-key fallback for clients without OAuth support.
 
-```bash
-claude mcp add --scope user --transport http drillr-data https://gateway.drillr.ai/mcp/data
-```
-
-Restart, run `/mcp`, pick `drillr-data` → **Authenticate**.
-
-### Codex CLI
-
-```bash
-codex mcp add drillr-data --url https://gateway.drillr.ai/mcp/data
-```
-
-Codex starts the browser sign-in from this command. `codex mcp login drillr-data` re-runs it later.
-
-### Cursor / VS Code / Claude Desktop / other OAuth hosts
-
-```jsonc
-{ "mcpServers": { "drillr-data": { "type": "http", "url": "https://gateway.drillr.ai/mcp/data" } } }
-```
-
-Cursor reads `.cursor/mcp.json`; VS Code reads `.vscode/mcp.json` with a top-level `servers` key; Claude Desktop takes the URL under Settings → Connectors → Add custom connector.
-
-[![Install in Cursor](https://img.shields.io/badge/Install_in-Cursor-171717?style=for-the-badge&logo=cursor&logoColor=white)](https://cursor.com/en/install-mcp?name=drillr-data&config=eyJ1cmwiOiJodHRwczovL2dhdGV3YXkuZHJpbGxyLmFpL21jcC9kYXRhIn0=) [![Install in VS Code](https://img.shields.io/badge/Install_in-VS_Code-0078D4?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=drillr-data&config=%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fgateway.drillr.ai%2Fmcp%2Fdata%22%7D)
-
-### API-key fallback
-
-For hosts without browser OAuth (Hermes, OpenClaw, self-built clients) or for REST: create an `external` key at [drillr.ai/account/api-keys](https://drillr.ai/account/api-keys), keep it in a secret store, and add it as a bearer header on the same URL. Never configure OAuth and a static header on the same server entry.
-
-```jsonc
-"headers": { "Authorization": "Bearer <YOUR_DRILLR_API_KEY>" }
-```
-
-```yaml
-# Hermes Agent
-mcp_servers:
-  drillr-data:
-    url: 'https://gateway.drillr.ai/mcp/data'
-    headers: { Authorization: 'Bearer <YOUR_DRILLR_API_KEY>' }
-```
+For manual setup and tool reference, see [drillr.ai/docs/mcp](https://drillr.ai/docs/mcp).
 
 ### Agent skill
 
-The companion skill teaches an agent how to onboard a user and use drillr well over REST or MCP, with a generated endpoint reference:
+The companion [drillr skill](https://github.com/Little-Grebe-Inc/drillr-skill) adds research workflows for MCP and REST. Installing the skill is optional for connecting the MCP server:
 
 ```bash
 npx skills add Little-Grebe-Inc/drillr-skill
 ```
 
-<https://github.com/Little-Grebe-Inc/drillr-skill>
+### Distribution options
 
-### Smithery / Claude Code plugin fallbacks
-
-```bash
-npx -y @smithery/cli install drillr/drillr --client claude   # Smithery: leave the key empty on OAuth clients
-```
+- [Smithery listing](https://smithery.ai/servers/drillr/drillr)
+- This repository also provides a Claude Code plugin marketplace:
 
 ```text
-/plugin marketplace add Little-Grebe-Inc/drillr-mcp-server      # Claude Code plugin marketplace
+/plugin marketplace add Little-Grebe-Inc/drillr-mcp-server
 /plugin install drillr
 ```
+
+After installing a plugin, use the official guide for sign-in and verification in the selected client.
 
 ## Hello World
 
